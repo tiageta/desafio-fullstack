@@ -5,9 +5,10 @@ import { LoginRoutingModule } from './login-routing.module';
 import { LoginPageComponent } from './components/login-page/login-page.component';
 import { LoginFormComponent } from './components/login-form/login-form.component';
 import { SharedModule } from '../shared/shared.module';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
   declarations: [LoginPageComponent, LoginFormComponent],
-  imports: [CommonModule, LoginRoutingModule, SharedModule],
+  imports: [CommonModule, LoginRoutingModule, SharedModule, FormsModule],
 })
 export class LoginModule {}

@@ -6,6 +6,9 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./login-form.component.scss'],
 })
 export class LoginFormComponent implements OnInit {
+  user = '';
+  password = '';
+  autoLogin = false;
   passwordType: 'password' | 'text' = 'password';
   showPassword = false;
 
@@ -13,7 +16,10 @@ export class LoginFormComponent implements OnInit {
 
   ngOnInit(): void {}
 
-  toggleShowPassword() {
+  login() {
+  }
+
+  toggleShowPassword(): void {
     this.showPassword = !this.showPassword;
     this.passwordType = this.showPassword ? 'text' : 'password';
   }
