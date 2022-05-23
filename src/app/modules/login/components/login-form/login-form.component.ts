@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login-form',
@@ -12,11 +13,12 @@ export class LoginFormComponent implements OnInit {
   passwordType: 'password' | 'text' = 'password';
   showPassword = false;
 
-  constructor() {}
+  constructor(private router: Router) {}
 
   ngOnInit(): void {}
 
-  login() {
+  login(): void {
+    this.router.navigate(['home']);
   }
 
   toggleShowPassword(): void {
