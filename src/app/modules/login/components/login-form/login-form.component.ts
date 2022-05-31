@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
+import { AuthService } from 'src/app/core/auth/auth.service';
 
 @Component({
   selector: 'app-login-form',
@@ -13,12 +14,15 @@ export class LoginFormComponent implements OnInit {
   passwordType: 'password' | 'text' = 'password';
   showPassword = false;
 
-  constructor(private router: Router) {}
+  constructor(private authService: AuthService, private router: Router) {}
 
   ngOnInit(): void {}
 
   login(): void {
-    this.router.navigate(['home']);
+    this.authService.auth(this.user, this.password).subscribe({
+      complete: () => this.router.navigate(['home']),
+      error: () => alert('Usuário ou senha inválidos'),
+    });
   }
 
   toggleShowPassword(): void {
