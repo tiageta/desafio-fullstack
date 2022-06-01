@@ -1,6 +1,6 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, Routes, Route } from '@angular/router';
 
 @Component({
   selector: 'app-menu',
@@ -28,11 +28,14 @@ import { Router } from '@angular/router';
 })
 export class MenuComponent {
   isMenuVisible = false;
+  paths = this.filterNavigablePaths(this.router.config);
 
   constructor(private router: Router) {}
 
-  isRouteActive(url: string): boolean {
-    return url === this.router.url;
+  private filterNavigablePaths(routes: Routes): string[] {
+    return routes
+      .map((route: Route) => route.path ?? '')
+      .filter((path) => path && path !== 'login');
   }
 
   toggleMenu(): void {

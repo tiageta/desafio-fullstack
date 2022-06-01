@@ -24,16 +24,11 @@
     <div class="mt-4 align-self-stretch">
       <div class="list-group">
         <a
-          [routerLink]="['/home']"
-          [ngClass]="{ active: isRouteActive('/home') }"
-          class="list-group-item list-group-item-action py-3 fs-5"
-          >Home</a
-        >
-        <a
-          [routerLink]="['/dashboard']"
-          [ngClass]="{ active: isRouteActive('/dashboard') }"
-          class="list-group-item list-group-item-action py-3 fs-5"
-          >Dashboard</a
+          *ngFor="let path of paths"
+          [routerLink]="['/', path]"
+          [routerLinkActive]="['active']"
+          class="list-group-item list-group-item-action py-3 fs-5 text-capitalize"
+          >{{ path }}</a
         >
       </div>
     </div>
