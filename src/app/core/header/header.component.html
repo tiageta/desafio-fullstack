@@ -9,8 +9,9 @@
             <i
               class="fa fa-user-circle fa-2x bg-light p-2 rounded-circle"
               role="button"
-              tabindex="-1"
+              tabindex="0"
               (click)="togglePopover($event)"
+              (keydown)="togglePopover($event)"
               (blur)="hidePopover()"
             >
             </i>
