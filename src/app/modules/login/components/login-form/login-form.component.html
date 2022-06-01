@@ -75,9 +75,12 @@
     <button
       class="submit"
       class="btn btn-primary btn-block"
-      [disabled]="loginForm.invalid"
+      [disabled]="loginForm.invalid || isSigningIn"
     >
-      Entrar
+      <div *ngIf="!isSigningIn; else spinnerBlock">Entrar</div>
+      <ng-template #spinnerBlock>
+        <span class="spinner-border spinner-border-sm" role="status"></span>
+      </ng-template>
     </button>
   </div>
 </form>
