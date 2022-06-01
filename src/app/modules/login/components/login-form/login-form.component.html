@@ -37,7 +37,14 @@
         #passwordField="ngModel"
         required
       />
-      <div class="input-group-text" (click)="toggleShowPassword()">
+      <div
+        tabindex="0"
+        role="button"
+        class="input-group-text position-relative"
+        style="z-index: 1"
+        (click)="toggleShowPassword()"
+        (keydown)="toggleShowPassword()"
+      >
         <i
           class="fa fa-solid fa-eye-slash text-primary"
           *ngIf="!showPassword; else eyeOpened"
@@ -51,24 +58,6 @@
       message="Senha obrigatória"
       *ngIf="passwordField.invalid && passwordField.touched"
     ></app-message>
-  </div>
-
-  <div id="auto-login-field" class="mb-3">
-    <div class="d-flex justify-content-end">
-      <label class="form-check-label" for="flexSwitchCheckDefault">
-        Logar automaticamente
-      </label>
-      <div class="toggle-switch form-check-inline form-switch ms-5 me-0">
-        <input
-          class="form-check-input"
-          type="checkbox"
-          role="switch"
-          id="flexSwitchCheckDefault"
-          [(ngModel)]="autoLogin"
-          name="autoLogin"
-        />
-      </div>
-    </div>
   </div>
 
   <div class="d-grid">

@@ -11,7 +11,6 @@ import { AuthService } from 'src/app/core/auth/auth.service';
 export class LoginFormComponent implements OnInit {
   user = '';
   password = '';
-  autoLogin = false;
   passwordType: 'password' | 'text' = 'password';
   showPassword = false;
   isSigningIn = false;
