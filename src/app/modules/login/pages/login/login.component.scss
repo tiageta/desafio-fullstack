@@ -3,3 +3,10 @@
   display: flex;
   align-items: center;
 }
+
+.ford-logo {
+  width: 100%;
+  @media (min-width: 40em) {
+    width: 50%;
+  }
+}
