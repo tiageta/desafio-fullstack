@@ -1,11 +1,5 @@
 <button class="navbar-toggler" type="button" (click)="toggleMenu()">
-  <span
-    *ngIf="!isMenuVisible; else closeIcon"
-    class="navbar-toggler-icon"
-  ></span>
-  <ng-template #closeIcon>
-    <span type="button" class="btn-close d-block"></span>
-  </ng-template>
+  <app-nav-toggler-icon [isClosed]="isMenuVisible"></app-nav-toggler-icon>
 </button>
 
 <div class="menu-background">
