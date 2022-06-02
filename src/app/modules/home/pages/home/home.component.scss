@@ -1,0 +1,15 @@
+#home-background {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+}
+
+.card {
+  opacity: 90%;
+  width: 75vw;
+  @media (min-width: 40em) {
+    width: 40vw;
+  }
+
+  min-height: 50vh;
+}
