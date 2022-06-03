@@ -1,22 +1,26 @@
 @import "/node_modules/bootstrap/scss/functions";
 @import "/node_modules/bootstrap/scss/variables";
 
-.account-popover {
-  --popover-triangle-size: 15px;
-  position: absolute;
-  z-index: 1;
-  transform: translate(-77%, var(--popover-triangle-size));
-
-  &::after {
-    content: "";
+header {
+  min-height: 10vh;
+  margin-block: auto;
+  .account-popover {
+    --popover-triangle-size: 15px;
     position: absolute;
-    top: 0;
-    right: 0;
-    display: block;
-    width: var(--popover-triangle-size);
-    height: var(--popover-triangle-size);
-    background-color: $secondary;
-    border-radius: 2px;
-    transform: translate(-100%, -50%) rotate(45deg);
+    z-index: 1;
+    transform: translate(-77%, var(--popover-triangle-size));
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: 0;
+      right: 0;
+      display: block;
+      width: var(--popover-triangle-size);
+      height: var(--popover-triangle-size);
+      background-color: $secondary;
+      border-radius: 2px;
+      transform: translate(-100%, -50%) rotate(45deg);
+    }
   }
 }
