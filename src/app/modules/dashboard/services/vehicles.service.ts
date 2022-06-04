@@ -1,8 +1,10 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, pluck } from 'rxjs';
 import {
+  Vehicles,
   VehiclesAPI,
+  VehiclesData,
   VehiclesDataAPI,
 } from 'src/app/shared/models/vehicle.model';
 import { environment } from 'src/environments/environment';
@@ -15,11 +17,13 @@ const API = environment.apiURL;
 export class VehiclesService {
   constructor(private http: HttpClient) {}
 
-  getVehicles(): Observable<VehiclesAPI> {
-    return this.http.get<VehiclesAPI>(`${API}/vehicle`);
+  getVehicles(): Observable<Vehicles> {
+    return this.http.get<VehiclesAPI>(`${API}/vehicle`).pipe(pluck('vehicles'));
   }
 
-  getVehicleData(vinCode: string): Observable<VehiclesDataAPI> {
-    return this.http.get<VehiclesDataAPI>(`${API}/vehicleData`);
+  getVehiclesData(): Observable<VehiclesData> {
+    return this.http
+      .get<VehiclesDataAPI>(`${API}/vehicleData`)
+      .pipe(pluck('vehicleData'));
   }
 }
