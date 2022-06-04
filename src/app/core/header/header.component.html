@@ -1,0 +1,47 @@
+<div *ngIf="user$ | async as user">
+  <div *ngIf="isUserLoggedIn()">
+    <header class="sticky-top">
+      <nav class="navbar navbar-light bg-white">
+        <div class="container-fluid">
+          <app-menu></app-menu>
+
+          <div class="user-icon position-relative">
+            <i
+              class="fa fa-user-circle fa-2x bg-light p-2 rounded-circle"
+              role="button"
+              tabindex="0"
+              (click)="togglePopover($event)"
+              (keydown)="togglePopover($event)"
+              (blur)="hidePopover()"
+            >
+            </i>
+
+            <div
+              @popoverInsertRemoveTrigger
+              *ngIf="isPopoverVisible"
+              class="account-popover start-0 bg-secondary p-3 px-5 rounded-3 text-light"
+            >
+              <div
+                class="d-flex justify-content-center align-items-center gap-3"
+              >
+                <i
+                  class="fa fa-user-circle fa-2x rounded-circle position-relative img-fluid"
+                ></i>
+                <div class="fs-5">
+                  {{ user.name }}
+                </div>
+              </div>
+              <hr />
+              <a
+                role="button"
+                class="d-block mt-2 text-center link-light"
+                (mousedown)="logout()"
+                >Logout</a
+              >
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+  </div>
+</div>

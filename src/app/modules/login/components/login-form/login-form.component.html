@@ -1,0 +1,75 @@
+<h2 class="text-center text-primary">Boas-vindas</h2>
+
+<form class="form mt-5" (ngSubmit)="login()" #loginForm="ngForm">
+  <div id="user-field" class="mb-3">
+    <div class="input-group">
+      <div class="input-group-text">
+        <i class="fa fa-solid fa-user text-primary"></i>
+      </div>
+      <input
+        type="text"
+        class="form-control"
+        placeholder="Insira seu usuário"
+        [(ngModel)]="user"
+        name="user"
+        #userField="ngModel"
+        required
+      />
+    </div>
+    <app-message
+      message="Usuário obrigatório"
+      *ngIf="userField.invalid && userField.touched"
+    ></app-message>
+  </div>
+
+  <div id="password-field" class="mb-3">
+    <div class="input-group">
+      <div class="input-group-text">
+        <i class="fa fa-solid fa-lock text-primary"></i>
+      </div>
+      <input
+        type="password"
+        [type]="passwordType"
+        class="form-control"
+        placeholder="Insira sua senha"
+        [(ngModel)]="password"
+        name="password"
+        #passwordField="ngModel"
+        required
+      />
+      <div
+        tabindex="0"
+        role="button"
+        class="input-group-text position-relative"
+        style="z-index: 1"
+        (click)="toggleShowPassword()"
+        (keydown)="toggleShowPassword()"
+      >
+        <i
+          class="fa fa-solid fa-eye-slash text-primary"
+          *ngIf="!showPassword; else eyeOpened"
+        ></i>
+        <ng-template #eyeOpened>
+          <i class="fa fa-solid fa-eye text-primary"></i>
+        </ng-template>
+      </div>
+    </div>
+    <app-message
+      message="Senha obrigatória"
+      *ngIf="passwordField.invalid && passwordField.touched"
+    ></app-message>
+  </div>
+
+  <div class="d-grid">
+    <button
+      class="submit"
+      class="btn btn-primary btn-block"
+      [disabled]="loginForm.invalid || isSigningIn"
+    >
+      <div *ngIf="!isSigningIn; else spinnerBlock">Entrar</div>
+      <ng-template #spinnerBlock>
+        <span class="spinner-border spinner-border-sm" role="status"></span>
+      </ng-template>
+    </button>
+  </div>
+</form>
