@@ -60,6 +60,28 @@
     ></app-message>
   </div>
 
+  <div id="auto-login-field" class="mb-3">
+    <div class="d-flex justify-content-end">
+      <label
+        class="form-check-label"
+        for="flexSwitchCheckDefault"
+        style="margin-top: 2px"
+      >
+        Logar automaticamente
+      </label>
+      <div class="toggle-switch form-check-inline form-switch ms-5 me-0">
+        <input
+          class="form-check-input"
+          type="checkbox"
+          role="switch"
+          id="flexSwitchCheckDefault"
+          [(ngModel)]="autoLogin"
+          name="autoLogin"
+        />
+      </div>
+    </div>
+  </div>
+
   <div class="d-grid">
     <button
       class="submit"

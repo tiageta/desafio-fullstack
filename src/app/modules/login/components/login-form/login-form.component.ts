@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { finalize } from 'rxjs';
 import { AuthService } from 'src/app/core/auth/auth.service';
+import { AutoLoginService } from 'src/app/core/services/auto-login.service';
 
 @Component({
   selector: 'app-login-form',
@@ -9,15 +10,23 @@ import { AuthService } from 'src/app/core/auth/auth.service';
   styleUrls: ['./login-form.component.scss'],
 })
 export class LoginFormComponent implements OnInit {
+  private _autoLogin = false;
+
   user = '';
   password = '';
   passwordType: 'password' | 'text' = 'password';
   showPassword = false;
   isSigningIn = false;
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private autoLoginService: AutoLoginService,
+    private router: Router
+  ) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this._autoLogin = this.autoLoginService.isAutoLoginEnabled();
+  }
 
   login(): void {
     this.isSigningIn = true;
@@ -33,5 +42,13 @@ export class LoginFormComponent implements OnInit {
   toggleShowPassword(): void {
     this.showPassword = !this.showPassword;
     this.passwordType = this.showPassword ? 'text' : 'password';
+  }
+
+  get autoLogin() {
+    return this._autoLogin;
+  }
+  set autoLogin(value) {
+    this._autoLogin = value;
+    this.autoLoginService.setAutoLogin(this._autoLogin);
   }
 }
