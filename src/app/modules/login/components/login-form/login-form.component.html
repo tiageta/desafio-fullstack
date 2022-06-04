@@ -43,11 +43,11 @@
         class="input-group-text position-relative"
         style="z-index: 1"
         (click)="toggleShowPassword()"
-        (keydown)="toggleShowPassword()"
+        (keypress)="toggleShowPassword()"
       >
         <i
           class="fa fa-solid fa-eye-slash text-primary"
-          *ngIf="!showPassword; else eyeOpened"
+          *ngIf="!isPasswordShown; else eyeOpened"
         ></i>
         <ng-template #eyeOpened>
           <i class="fa fa-solid fa-eye text-primary"></i>
@@ -58,6 +58,46 @@
       message="Senha obrigatória"
       *ngIf="passwordField.invalid && passwordField.touched"
     ></app-message>
+  </div>
+
+  <div id="auto-login-field" class="mb-3">
+    <div class="d-flex justify-content-center justify-content-md-end">
+      <label
+        class="form-check-label"
+        for="flexSwitchCheckDefault"
+        style="margin-top: 2px"
+      >
+        Logar automaticamente
+      </label>
+      <div class="toggle-switch form-check-inline form-switch ms-5 me-0">
+        <input
+          class="form-check-input"
+          type="checkbox"
+          role="switch"
+          id="flexSwitchCheckDefault"
+          [(ngModel)]="autoLogin"
+          name="autoLogin"
+        />
+        <i
+          class="login-tooltip-icon d-flex fa fa-info text-primary"
+          tabindex="0"
+          (mouseover)="showTooltip()"
+          (mouseout)="hideTooltip()"
+          (keypress)="toggleTooltip()"
+          (touchstart)="toggleTooltip()"
+        >
+        </i>
+        <div
+          @fade
+          class="login-tooltip"
+          *ngIf="isTooltipVisible"
+          (touchstart)="toggleTooltip()"
+        >
+          Se desmarcado, será necessário entrar com o login novamente após 10
+          segundos da página ter sido fechada.
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="d-grid">
