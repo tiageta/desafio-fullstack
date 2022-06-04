@@ -1,0 +1,33 @@
+<div class="container" *ngIf="vehicles$ | async as vehicles">
+  <div
+    class="d-flex flex-wrap gap-2 align-items-stretch justify-content-center justify-content-md-between"
+  >
+    <div class="card">
+      <div class="card-header">Veículo</div>
+      <div class="card-body">
+        <select
+          class="form-select form-select-lg"
+          [(ngModel)]="selectedVehicle"
+          (change)="selectVehicleEvent.emit(selectedVehicle)"
+        >
+          <option disabled selected value="-">-</option>
+          <option *ngFor="let v of vehicles" [value]="v.vehicle">
+            {{ v.vehicle }}
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <div *ngFor="let dataCard of dataCards">
+      <div class="card">
+        <div class="card-header fs-5">{{ dataCard.header }}</div>
+        <div class="card-body">
+          <div class="fs-5 text-primary fw-bold">
+            {{ dataCard.callback(vehicles) }}
+          </div>
+          <small class="text-black-50">Unid.</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
