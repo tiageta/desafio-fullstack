@@ -17,25 +17,25 @@ export class AppComponent {
     private autoLoginService: AutoLoginService
   ) {}
 
-  @HostListener('window:beforeunload')
+  @HostListener('window:unload')
   beforeUnloadHandler() {
     if (!localStorage) return;
-    localStorage['logoutFlag'] = new Date().getTime();
+    localStorage['logoutFlag'] = Date.now();
   }
 
   @HostListener('window:load')
   loadHandler() {
     if (!localStorage) return;
-    let lastCloseTime = Number(localStorage['logoutFlag']);
-    if (isNaN(lastCloseTime)) lastCloseTime = 0;
-    const currentTime = new Date().getTime();
+    let startTime = Number(localStorage['logoutFlag']);
+    if (isNaN(startTime)) startTime = 0;
+    const endTime = Date.now();
 
-    const timeSinceLastClose = currentTime - lastCloseTime;
+    const totalTime = endTime - startTime;
     if (
       !this.autoLoginService.isAutoLoginEnabled() &&
       this.userService.isLoggedIn()
     ) {
-      if (timeSinceLastClose > LOGIN_TIMEOUT_MS) {
+      if (totalTime > LOGIN_TIMEOUT_MS) {
         this.userService.logout();
       }
     }
