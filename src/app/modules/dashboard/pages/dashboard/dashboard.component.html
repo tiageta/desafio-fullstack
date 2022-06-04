@@ -4,4 +4,14 @@
   <app-data-cards
     (selectVehicleEvent)="selectedVehicle = $event"
   ></app-data-cards>
+
+  <img
+    [@imageLeave]="hasSelectionChanged"
+    (@imageLeave.done)="afterLeave()"
+    [@imageArrive]="hasImgLeft && hasSelectionChanged"
+    (@imageArrive.done)="afterArrive()"
+    [src]="vehicleImgUrl"
+    [alt]="vehicleImgAlt"
+    class="car-picture img-fluid w-50 d-block mx-auto mt-2"
+  />
 </div>
