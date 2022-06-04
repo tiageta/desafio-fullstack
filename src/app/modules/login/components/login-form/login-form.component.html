@@ -61,7 +61,7 @@
   </div>
 
   <div id="auto-login-field" class="mb-3">
-    <div class="d-flex justify-content-end">
+    <div class="d-flex justify-content-center justify-content-md-end">
       <label
         class="form-check-label"
         for="flexSwitchCheckDefault"
@@ -78,6 +78,24 @@
           [(ngModel)]="autoLogin"
           name="autoLogin"
         />
+        <i
+          class="login-tooltip-icon d-flex fa fa-info text-primary"
+          tabindex="0"
+          (mouseover)="showTooltip()"
+          (mouseout)="hideTooltip()"
+          (keypress)="toggleTooltip()"
+          (touchstart)="toggleTooltip()"
+        >
+        </i>
+        <div
+          @fade
+          class="login-tooltip"
+          *ngIf="isTooltipVisible"
+          (touchstart)="toggleTooltip()"
+        >
+          Se desmarcado, será necessário entrar com o login novamente após 10
+          segundos da página ter sido fechada.
+        </div>
       </div>
     </div>
   </div>

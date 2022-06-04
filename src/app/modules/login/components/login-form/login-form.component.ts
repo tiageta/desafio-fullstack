@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { animate, style, transition, trigger } from '@angular/animations';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { finalize } from 'rxjs';
+import { finalize, Subscription } from 'rxjs';
 import { AuthService } from 'src/app/core/auth/auth.service';
 import { AutoLoginService } from 'src/app/core/services/auto-login.service';
 
@@ -8,6 +9,18 @@ import { AutoLoginService } from 'src/app/core/services/auto-login.service';
   selector: 'app-login-form',
   templateUrl: './login-form.component.html',
   styleUrls: ['./login-form.component.scss'],
+  animations: [
+    trigger('fade', [
+      transition(':enter', [
+        style({ opacity: 0 }),
+        animate(100, style({ opacity: 1 })),
+      ]),
+      transition(':leave', [
+        style({ opacity: 1 }),
+        animate(100, style({ opacity: 0 })),
+      ]),
+    ]),
+  ],
 })
 export class LoginFormComponent implements OnInit, OnDestroy {
   private _autoLogin = false;
@@ -18,6 +31,7 @@ export class LoginFormComponent implements OnInit, OnDestroy {
   passwordType: 'password' | 'text' = 'password';
   isPasswordShown = false;
   isSigningIn = false;
+  isTooltipVisible = false;
 
   constructor(
     private authService: AuthService,
@@ -48,6 +62,15 @@ export class LoginFormComponent implements OnInit, OnDestroy {
     this.isPasswordShown = !this.isPasswordShown;
     this.passwordType = this.isPasswordShown ? 'text' : 'password';
   }
+
+  showTooltip(): void {
+    this.isTooltipVisible = true;
+  }
+  hideTooltip(): void {
+    this.isTooltipVisible = false;
+  }
+  toggleTooltip(): void {
+    this.isTooltipVisible = !this.isTooltipVisible;
   }
 
   get autoLogin() {
