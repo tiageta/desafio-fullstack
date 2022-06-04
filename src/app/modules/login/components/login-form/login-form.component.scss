@@ -1,5 +1,44 @@
+@import "/node_modules/bootstrap/scss/functions";
+@import "/node_modules/bootstrap/scss/variables";
+
 .toggle-switch {
   font-size: 1.5rem;
   position: relative;
   bottom: 0.2rem;
+}
+
+#auto-login-field {
+  position: relative;
+
+  .login-tooltip {
+    background-color: $secondary;
+    color: white;
+    font-size: 0.875rem;
+    width: 20rem;
+    height: 5rem;
+    position: absolute;
+    bottom: 0;
+    left: -14rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 0.25rem 1rem;
+    border-radius: 10px;
+    transform: translateY(100%);
+    z-index: 1;
+  }
+
+  .login-tooltip-icon {
+    position: absolute;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    right: -1.6rem;
+    top: 6px;
+    background-color: transparent;
+    border: 2px solid $primary;
+    justify-content: center;
+    align-items: center;
+    font-size: 1rem;
+  }
 }
