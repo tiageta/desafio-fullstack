@@ -2,6 +2,8 @@ import { Component, HostListener } from '@angular/core';
 import { AutoLoginService } from './core/services/auto-login.service';
 import { UserService } from './core/services/user.service';
 
+const LOGIN_TIMEOUT_MS = 10 * 1000; // 10s
+
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -32,7 +34,7 @@ export class AppComponent {
       !this.autoLoginService.isAutoLoginEnabled() &&
       this.userService.isLoggedIn()
     ) {
-      if (timeSinceLastClose > 1 * 1000) {
+      if (timeSinceLastClose > LOGIN_TIMEOUT_MS) {
         this.userService.logout();
       }
     }

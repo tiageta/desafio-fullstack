@@ -43,11 +43,11 @@
         class="input-group-text position-relative"
         style="z-index: 1"
         (click)="toggleShowPassword()"
-        (keydown)="toggleShowPassword()"
+        (keypress)="toggleShowPassword()"
       >
         <i
           class="fa fa-solid fa-eye-slash text-primary"
-          *ngIf="!showPassword; else eyeOpened"
+          *ngIf="!isPasswordShown; else eyeOpened"
         ></i>
         <ng-template #eyeOpened>
           <i class="fa fa-solid fa-eye text-primary"></i>

@@ -9,13 +9,14 @@ import { AutoLoginService } from 'src/app/core/services/auto-login.service';
   templateUrl: './login-form.component.html',
   styleUrls: ['./login-form.component.scss'],
 })
-export class LoginFormComponent implements OnInit {
+export class LoginFormComponent implements OnInit, OnDestroy {
   private _autoLogin = false;
+  private _authSub = new Subscription();
 
   user = '';
   password = '';
   passwordType: 'password' | 'text' = 'password';
-  showPassword = false;
+  isPasswordShown = false;
   isSigningIn = false;
 
   constructor(
@@ -28,9 +29,13 @@ export class LoginFormComponent implements OnInit {
     this._autoLogin = this.autoLoginService.isAutoLoginEnabled();
   }
 
+  ngOnDestroy(): void {
+    this._authSub.unsubscribe();
+  }
+
   login(): void {
     this.isSigningIn = true;
-    this.authService
+    this._authSub = this.authService
       .auth(this.user, this.password)
       .pipe(finalize(() => (this.isSigningIn = false)))
       .subscribe({
@@ -40,8 +45,9 @@ export class LoginFormComponent implements OnInit {
   }
 
   toggleShowPassword(): void {
-    this.showPassword = !this.showPassword;
-    this.passwordType = this.showPassword ? 'text' : 'password';
+    this.isPasswordShown = !this.isPasswordShown;
+    this.passwordType = this.isPasswordShown ? 'text' : 'password';
+  }
   }
 
   get autoLogin() {
