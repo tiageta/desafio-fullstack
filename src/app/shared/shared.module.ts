@@ -1,11 +1,11 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FordLogoComponent } from './components/ford-logo/ford-logo.component';
 import { MessageComponent } from './components/message/message.component';
+import { NavTogglerIconComponent } from './components/nav-toggler-icon/nav-toggler-icon.component';
 
 @NgModule({
-  declarations: [FordLogoComponent, MessageComponent],
+  declarations: [MessageComponent, NavTogglerIconComponent],
   imports: [CommonModule],
-  exports: [FordLogoComponent, MessageComponent],
+  exports: [MessageComponent, NavTogglerIconComponent],
 })
 export class SharedModule {}

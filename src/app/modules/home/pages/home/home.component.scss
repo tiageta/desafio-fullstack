@@ -1,0 +1,19 @@
+.view-container {
+  min-height: 90vh;
+
+  #home-background {
+    position: absolute;
+    inset: 0;
+    margin: auto;
+  }
+
+  .card {
+    opacity: 90%;
+    width: 75vw;
+    @media (min-width: 40em) {
+      width: 40vw;
+    }
+
+    min-height: 50vh;
+  }
+}
