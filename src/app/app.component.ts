@@ -26,7 +26,8 @@ export class AppComponent {
   @HostListener('window:load')
   loadHandler() {
     if (!localStorage) return;
-    const lastCloseTime = Number(localStorage['logoutFlag']) ?? 0;
+    let lastCloseTime = Number(localStorage['logoutFlag']);
+    if (isNaN(lastCloseTime)) lastCloseTime = 0;
     const currentTime = new Date().getTime();
 
     const timeSinceLastClose = currentTime - lastCloseTime;
