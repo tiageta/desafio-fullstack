@@ -1,0 +1,41 @@
+<div *ngIf="{ vehiclesData: vehiclesData$ | async } as vd">
+  <div class="table-responsive">
+    <table class="mb-0">
+      <thead>
+        <tr class="d-flex bg-primary text-white">
+          <th *ngFor="let tableField of tableFields" class="col" scope="col">
+            {{ tableField.header }}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="d-flex pt-1 pb-1">
+          <td *ngFor="let tableField of tableFields" class="col">
+            <ng-container *ngIf="!tableField.data; else dataCol">
+              <input
+                class="form-control-sm"
+                type="text"
+                [formControl]="searchedVin"
+              />
+            </ng-container>
+            <ng-template #dataCol>
+              <ng-container *ngIf="vd.vehiclesData; else placeholder">
+                {{ getDataFromVehicle(tableField.data, vd.vehiclesData) }}
+              </ng-container>
+              <ng-template #placeholder>
+                <div class="placeholder-glow">
+                  <span class="placeholder bg-primary col-4">&nbsp;</span>
+                </div>
+              </ng-template>
+            </ng-template>
+          </td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="100%" class="bg-primary"></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>

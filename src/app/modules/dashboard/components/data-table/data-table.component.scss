@@ -1,0 +1,40 @@
+table {
+  width: 100%;
+  min-height: 5em;
+  max-width: 100%;
+  color: #212529;
+  border-color: #dee2e6;
+
+  input {
+    &:disabled {
+      background-color: #ddd;
+    }
+    width: 75% !important;
+  }
+
+  td,
+  tr {
+    border: none;
+  }
+
+  tbody,
+  thead {
+    td,
+    th {
+      border-inline: 1px solid #ccc;
+      align-self: stretch;
+      padding-inline: 1em;
+      display: grid;
+      align-items: center;
+      min-height: 3rem;
+      min-width: 7rem;
+      &:first-child {
+        flex-grow: 1.5 !important;
+      }
+    }
+  }
+
+  tfoot {
+    height: 0.5em;
+  }
+}
