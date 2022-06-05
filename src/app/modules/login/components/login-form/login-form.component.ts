@@ -54,7 +54,12 @@ export class LoginFormComponent implements OnInit, OnDestroy {
       .pipe(finalize(() => (this.isSigningIn = false)))
       .subscribe({
         complete: () => this.router.navigate(['home']),
-        error: () => alert('Usuário ou senha inválidos'),
+        error: (err) =>
+          alert(
+            err.status
+              ? 'Usuário ou senha inválidos'
+              : 'Sem resposta do servidor'
+          ),
       });
   }
 
