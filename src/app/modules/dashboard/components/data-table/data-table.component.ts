@@ -1,11 +1,12 @@
-import { Component } from '@angular/core';
+import { animate, style, transition, trigger } from '@angular/animations';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import {
   debounceTime,
   distinctUntilChanged,
-  filter,
   merge,
   Observable,
+  Subscription,
   switchMap,
   tap,
 } from 'rxjs';
@@ -13,35 +14,67 @@ import { VehiclesData } from 'src/app/shared/models/vehicle.model';
 import { TableField, TableFields } from '../../interfaces/table-field';
 import { VehiclesService } from '../../services/vehicles.service';
 
-const MIN_CHAR_TRIGGER = 4;
+const VIN_LENGTH = 20;
 const INPUT_DEBOUNCE_MS = 200;
 
 @Component({
   selector: 'app-data-table',
   templateUrl: './data-table.component.html',
   styleUrls: ['./data-table.component.scss'],
+  animations: [
+    trigger('delaySpinner', [
+      transition(':enter', [
+        style({ opacity: 0 }),
+        animate('250ms 250ms', style({ opacity: 1 })),
+      ]),
+    ]),
+  ],
 })
-export class DataTableComponent {
+export class DataTableComponent implements OnInit, OnDestroy {
+  private _allVehiclesData!: VehiclesData;
+  private _allVehiclesDataSub!: Subscription;
+  private _hasVinMatched = false;
+  private _isTableDataOnScreen = false;
+
+  isLoadingTableData = false;
+
   searchedVin = new FormControl(
     { value: '', disabled: true },
     Validators.required
   );
 
-  allVehiclesData$ = this.vehiclesService.getVehiclesData();
+  allVehiclesData$: Observable<VehiclesData> =
+    this.vehiclesService.getVehiclesData();
+
   filteredVehiclesData$: Observable<VehiclesData> =
     this.searchedVin.valueChanges.pipe(
       debounceTime(INPUT_DEBOUNCE_MS),
-      filter(
-        (inputtedValue) =>
-          inputtedValue.length >= MIN_CHAR_TRIGGER || !inputtedValue.length
-      ),
+      tap((inputtedValue) => {
+        // Store flag locally as to not depend o input value later in pipe
+        this._hasVinMatched =
+          inputtedValue.length === VIN_LENGTH &&
+          this.vinMatchVehicleData(inputtedValue);
+
+        // sets flag that triggers spinner in template
+        this.isLoadingTableData =
+          (this._hasVinMatched && !this._isTableDataOnScreen) ||
+          (!this._hasVinMatched && this._isTableDataOnScreen);
+      }),
       distinctUntilChanged(),
       switchMap((inputtedValue) =>
         this.vehiclesService.getVehiclesData(inputtedValue)
       ),
-      tap(console.log)
+      tap(() => {
+        if (this.isLoadingTableData)
+          this._isTableDataOnScreen = this._hasVinMatched;
+        this.isLoadingTableData = false;
+      })
     );
-  vehiclesData$ = merge(this.allVehiclesData$, this.filteredVehiclesData$).pipe(
+
+  vehiclesData$: Observable<VehiclesData> = merge(
+    this.allVehiclesData$,
+    this.filteredVehiclesData$
+  ).pipe(
     tap(() =>
       this.searchedVin.enable({
         onlySelf: true,
@@ -61,8 +94,24 @@ export class DataTableComponent {
 
   constructor(private vehiclesService: VehiclesService) {}
 
+  ngOnInit(): void {
+    this._allVehiclesDataSub = this.allVehiclesData$.subscribe(
+      (allVehiclesData) => (this._allVehiclesData = allVehiclesData)
+    );
+  }
+
+  ngOnDestroy(): void {
+    this._allVehiclesDataSub.unsubscribe();
+  }
+
   getDataFromVehicle(data: TableField['data'], vehiclesData: VehiclesData) {
-    if (!data || vehiclesData.length !== 1) return ''; // still no match
+    if (!data || vehiclesData.length !== 1) return '0'; // still no match
     return vehiclesData[0][data];
+  }
+
+  vinMatchVehicleData(vin: string): boolean {
+    return !!this._allVehiclesData.find(
+      (vehicleData) => vehicleData.vin === vin
+    );
   }
 }

@@ -10,7 +10,12 @@ import { DataCardsComponent } from './components/data-cards/data-cards.component
 import { CarImageComponent } from './components/car-image/car-image.component';
 
 @NgModule({
-  declarations: [DashboardComponent, DataTableComponent, DataCardsComponent, CarImageComponent],
+  declarations: [
+    DashboardComponent,
+    DataTableComponent,
+    DataCardsComponent,
+    CarImageComponent,
+  ],
   imports: [
     CommonModule,
     DashboardRoutingModule,

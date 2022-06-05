@@ -13,18 +13,35 @@
           <td *ngFor="let tableField of tableFields" class="col">
             <ng-container *ngIf="!tableField.data; else dataCol">
               <input
+                list="dataVehicles"
                 class="form-control-sm"
                 type="text"
                 [formControl]="searchedVin"
               />
+              <datalist id="dataVehicles">
+                <option *ngFor="let vehicleData of vd.vehiclesData">
+                  {{ vehicleData.vin }}
+                </option>
+              </datalist>
             </ng-container>
             <ng-template #dataCol>
               <ng-container *ngIf="vd.vehiclesData; else placeholder">
-                {{ getDataFromVehicle(tableField.data, vd.vehiclesData) }}
+                <span *ngIf="!isLoadingTableData; else spinnerBlock">
+                  {{
+                    getDataFromVehicle(tableField.data, vd.vehiclesData)
+                  }}</span
+                >
+                <ng-template #spinnerBlock>
+                  <span
+                    @delaySpinner
+                    class="spinner-border spinner-border-sm"
+                    role="status"
+                  ></span>
+                </ng-template>
               </ng-container>
               <ng-template #placeholder>
                 <div class="placeholder-glow">
-                  <span class="placeholder bg-primary col-4">&nbsp;</span>
+                  <span class="placeholder col-2">&nbsp;</span>
                 </div>
               </ng-template>
             </ng-template>
