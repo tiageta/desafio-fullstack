@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, pluck } from 'rxjs';
+import { map, Observable, pluck } from 'rxjs';
 import {
   Vehicles,
   VehiclesAPI,
@@ -21,9 +21,16 @@ export class VehiclesService {
     return this.http.get<VehiclesAPI>(`${API}/vehicle`).pipe(pluck('vehicles'));
   }
 
-  getVehiclesData(): Observable<VehiclesData> {
-    return this.http
-      .get<VehiclesDataAPI>(`${API}/vehicleData`)
-      .pipe(pluck('vehicleData'));
+  getVehiclesData(vin?: string): Observable<VehiclesData> {
+    return this.http.get<VehiclesDataAPI>(`${API}/vehicleData`).pipe(
+      pluck('vehicleData'),
+      map((vehiclesData) => {
+        if (vin)
+          return vehiclesData.filter((vehicleData) =>
+            vehicleData.vin?.includes(vin)
+          );
+        return vehiclesData;
+      })
+    );
   }
 }
