@@ -1,0 +1,9 @@
+<img
+  [@imageLeave]="triggerLeave()"
+  (@imageLeave.done)="afterLeave()"
+  [@imageArrive]="triggerArrive()"
+  (@imageArrive.done)="afterArrive()"
+  [src]="vehicleImgUrl"
+  [alt]="vehicleImgAlt"
+  class="car-picture img-fluid w-50 d-block mx-auto mt-2"
+/>
