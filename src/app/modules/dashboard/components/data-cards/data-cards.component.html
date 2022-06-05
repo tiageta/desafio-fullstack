@@ -1,19 +1,27 @@
-<div class="container" *ngIf="vehicles$ | async as vehicles">
+<!-- async pipe wrapped in object to always return true; used for placeholder logic -->
+<div class="container" *ngIf="{ vehicles: vehicles$ | async } as v">
   <div
     class="d-flex flex-wrap gap-2 align-items-stretch justify-content-center justify-content-md-between"
   >
     <div class="card">
-      <div class="card-header">Veículo</div>
+      <div class="card-header fs-5">Veículo</div>
       <div class="card-body">
         <select
           class="form-select form-select-lg"
+          [disabled]="!v.vehicles"
           [(ngModel)]="selectedVehicle"
           (change)="selectVehicleEvent.emit(selectedVehicle)"
         >
-          <option disabled selected value="-">-</option>
-          <option *ngFor="let v of vehicles" [value]="v.vehicle">
-            {{ v.vehicle }}
-          </option>
+          <ng-container *ngIf="!!v.vehicles">
+            <option disabled selected value="-">-</option>
+            <option
+              *ngFor="let vehicle of v.vehicles"
+              [value]="vehicle.vehicle"
+            >
+              <!-- redudancy due to API naming convention -->
+              {{ vehicle.vehicle }}
+            </option>
+          </ng-container>
         </select>
       </div>
     </div>
@@ -22,9 +30,17 @@
       <div class="card">
         <div class="card-header fs-5">{{ dataCard.header }}</div>
         <div class="card-body">
-          <div class="fs-5 text-primary fw-bold">
-            {{ dataCard.callback(vehicles) }}
+          <div
+            *ngIf="!!v.vehicles; else placeholder"
+            class="fs-5 text-primary fw-bold"
+          >
+            {{ dataCard.callback(v.vehicles) }}
           </div>
+          <ng-template #placeholder>
+            <div class="placeholder-glow">
+              <span class="placeholder col-4 bg-primary">&nbsp;</span>
+            </div>
+          </ng-template>
           <small class="text-black-50">Unid.</small>
         </div>
       </div>
