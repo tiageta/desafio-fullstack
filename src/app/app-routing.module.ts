@@ -14,12 +14,14 @@ const routes: Routes = [
     loadChildren: () =>
       import('./modules/login/login.module').then((m) => m.LoginModule),
     canLoad: [LoginGuard],
+    canActivate: [LoginGuard],
   },
   {
     path: 'home',
     loadChildren: () =>
       import('./modules/home/home.module').then((m) => m.HomeModule),
     canLoad: [AuthGuard],
+    canActivate: [AuthGuard],
   },
   {
     path: 'dashboard',
@@ -28,11 +30,12 @@ const routes: Routes = [
         (m) => m.DashboardModule
       ),
     canLoad: [AuthGuard],
+    canActivate: [AuthGuard],
   },
 ];
 
 @NgModule({
-  imports: [RouterModule.forRoot(routes)],
+  imports: [RouterModule.forRoot(routes, { useHash: true })],
   exports: [RouterModule],
 })
 export class AppRoutingModule {}
