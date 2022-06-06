@@ -3,8 +3,14 @@
   z-index: 2;
   padding: 0;
   border: 1px solid hsl(0, 0%, 40%);
-  &:focus {
+  transition: box-shadow 200ms ease-out;
+
+  &:hover,
+  &:focus:hover {
     box-shadow: 0 0 0 0.1rem;
+  }
+  &:focus {
+    box-shadow: none;
   }
 }
 
