@@ -1,0 +1,59 @@
+<div *ngIf="{ vehiclesData: vehiclesData$ | async } as vd">
+  <div class="table-responsive">
+    <table class="mb-0">
+      <thead>
+        <tr class="d-flex bg-primary text-white">
+          <th *ngFor="let tableField of tableFields" class="col" scope="col">
+            {{ tableField.header }}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="d-flex pt-1 pb-1">
+          <td *ngFor="let tableField of tableFields" class="col">
+            <ng-container *ngIf="!tableField.data; else dataCol">
+              <input
+                #vinInput
+                list="dataVehicles"
+                class="form-control-sm"
+                type="text"
+                [formControl]="searchedVin"
+              />
+              <datalist id="dataVehicles">
+                <option *ngFor="let vehicleData of vd.vehiclesData">
+                  {{ vehicleData.vin }}
+                </option>
+              </datalist>
+            </ng-container>
+            <ng-template #dataCol>
+              <ng-container *ngIf="vd.vehiclesData; else placeholder">
+                <span *ngIf="!isLoadingTableData; else spinnerBlock">
+                  {{
+                    getDataFromVehicle(tableField.data, vd.vehiclesData)
+                  }}</span
+                >
+                <ng-template #spinnerBlock>
+                  <span
+                    @delaySpinner
+                    class="spinner-border spinner-border-sm"
+                    role="status"
+                  ></span>
+                </ng-template>
+              </ng-container>
+              <ng-template #placeholder>
+                <div class="placeholder-glow">
+                  <span class="placeholder col-2">&nbsp;</span>
+                </div>
+              </ng-template>
+            </ng-template>
+          </td>
+        </tr>
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="100%" class="bg-primary"></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+</div>

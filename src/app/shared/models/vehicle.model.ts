@@ -11,3 +11,21 @@ export interface Vehicle {
 export interface VehiclesAPI {
   vehicles: Vehicles;
 }
+
+export interface VehicleData {
+  id: number | string;
+  vin: string;
+  odometer: number | string;
+  fuelLevel: number | string;
+  status: string;
+  lat: number | string;
+  long: number | string;
+  tirePressure: string;
+  batteryStatus: string;
+}
+
+export interface VehiclesData extends Array<VehicleData> {}
+
+export interface VehiclesDataAPI {
+  vehicleData: VehiclesData;
+}

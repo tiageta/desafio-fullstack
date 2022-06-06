@@ -1,1 +1,11 @@
-<p>dashboard works!</p>
+<div class="viewport-center d-flex flex-column align-items-between">
+  <h1 class="text-primary display-4 text-center mb-4">Dashboard FORD</h1>
+
+  <app-data-cards (selectVehicleEvent)="selectVehicle($event)"></app-data-cards>
+
+  <app-car-image [selectedVehicle]="selectedVehicle"></app-car-image>
+
+  <app-data-table
+    class="position-fixed bottom-0 start-0 end-0 bg-white"
+  ></app-data-table>
+</div>
