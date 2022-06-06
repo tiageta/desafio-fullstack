@@ -109,8 +109,8 @@ export class DataTableComponent implements OnInit, OnDestroy {
 
   tableFields: TableFields = [
     { header: 'Código - Vin' },
-    { header: 'Odômetro', data: 'odometer' },
-    { header: 'Nível de Combustível', data: 'fuelLevel' },
+    { header: 'Odômetro', data: 'odometer', unit: ' km' },
+    { header: 'Nível de Combustível', data: 'fuelLevel', unit: ' %' },
     { header: 'Status', data: 'status' },
     { header: 'Lat.', data: 'lat' },
     { header: 'Long.', data: 'long' },
@@ -129,8 +129,8 @@ export class DataTableComponent implements OnInit, OnDestroy {
   }
 
   getDataFromVehicle(data: TableField['data'], vehiclesData: VehiclesData) {
-    if (!data || vehiclesData.length !== 1) return '0'; // still no match
-    return vehiclesData[0][data];
+    if (!data || vehiclesData.length !== 1) return '-'; // still no match
+    return vehiclesData[0][data].toString();
   }
 
   vinMatchVehicleData(vin: string): boolean {

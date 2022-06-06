@@ -27,9 +27,14 @@
             </ng-container>
             <ng-template #dataCol>
               <ng-container *ngIf="vd.vehiclesData; else placeholder">
-                <span *ngIf="!isLoadingTableData; else spinnerBlock">
+                <span
+                  *ngIf="!isLoadingTableData; else spinnerBlock"
+                  class="fw-bold"
+                >
                   {{
-                    getDataFromVehicle(tableField.data, vd.vehiclesData)
+                    getDataFromVehicle(tableField.data, vd.vehiclesData).concat(
+                      tableField.unit ?? ""
+                    )
                   }}</span
                 >
                 <ng-template #spinnerBlock>
