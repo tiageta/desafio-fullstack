@@ -13,6 +13,7 @@
           <td *ngFor="let tableField of tableFields" class="col">
             <ng-container *ngIf="!tableField.data; else dataCol">
               <input
+                #vinInput
                 list="dataVehicles"
                 class="form-control-sm"
                 type="text"

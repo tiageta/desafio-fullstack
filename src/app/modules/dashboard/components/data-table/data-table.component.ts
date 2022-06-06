@@ -1,5 +1,11 @@
 import { animate, style, transition, trigger } from '@angular/animations';
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import {
   debounceTime,
@@ -31,8 +37,8 @@ const INPUT_DEBOUNCE_MS = 200;
   ],
 })
 export class DataTableComponent implements OnInit, OnDestroy {
-  private _allVehiclesData!: VehiclesData;
-  private _allVehiclesDataSub!: Subscription;
+  private _allVehiclesData: VehiclesData | undefined;
+  private _allVehiclesDataSub = new Subscription();
   private _hasVinMatched = false;
   private _isTableDataOnScreen = false;
 
@@ -42,6 +48,9 @@ export class DataTableComponent implements OnInit, OnDestroy {
     { value: '', disabled: true },
     Validators.required
   );
+
+  @ViewChild('vinInput')
+  vinInput: ElementRef | undefined;
 
   allVehiclesData$: Observable<VehiclesData> =
     this.vehiclesService.getVehiclesData();
@@ -55,7 +64,12 @@ export class DataTableComponent implements OnInit, OnDestroy {
           inputtedValue.length === VIN_LENGTH &&
           this.vinMatchVehicleData(inputtedValue);
 
-        // sets flag that triggers spinner in template
+        // Unfocus input field as to not popup datalist on data load
+        if (this._hasVinMatched && this.vinInput) {
+          this.vinInput.nativeElement.blur();
+        }
+
+        // Sets flag that triggers spinner in template
         this.isLoadingTableData =
           (this._hasVinMatched && !this._isTableDataOnScreen) ||
           (!this._hasVinMatched && this._isTableDataOnScreen);
@@ -110,7 +124,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
   }
 
   vinMatchVehicleData(vin: string): boolean {
-    return !!this._allVehiclesData.find(
+    return !!this._allVehiclesData?.find(
       (vehicleData) => vehicleData.vin === vin
     );
   }
