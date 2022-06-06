@@ -10,6 +10,7 @@ import { FormControl, Validators } from '@angular/forms';
 import {
   debounceTime,
   distinctUntilChanged,
+  map,
   merge,
   Observable,
   Subscription,
@@ -50,7 +51,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
   );
 
   @ViewChild('vinInput')
-  vinInput: ElementRef | undefined;
+  vinInputElement: ElementRef | undefined;
 
   allVehiclesData$: Observable<VehiclesData> =
     this.vehiclesService.getVehiclesData();
@@ -58,6 +59,14 @@ export class DataTableComponent implements OnInit, OnDestroy {
   filteredVehiclesData$: Observable<VehiclesData> =
     this.searchedVin.valueChanges.pipe(
       debounceTime(INPUT_DEBOUNCE_MS),
+      map((inputtedValue: string) => {
+        // Converts value to uppercase in forms
+        const upperCaseInputtedValue = inputtedValue.toUpperCase();
+        this.searchedVin.setValue(upperCaseInputtedValue, {
+          emitEvent: false,
+        });
+        return upperCaseInputtedValue;
+      }),
       tap((inputtedValue) => {
         // Store flag locally as to not depend o input value later in pipe
         this._hasVinMatched =
@@ -65,8 +74,8 @@ export class DataTableComponent implements OnInit, OnDestroy {
           this.vinMatchVehicleData(inputtedValue);
 
         // Unfocus input field as to not popup datalist on data load
-        if (this._hasVinMatched && this.vinInput) {
-          this.vinInput.nativeElement.blur();
+        if (this._hasVinMatched && this.vinInputElement) {
+          this.vinInputElement.nativeElement.blur();
         }
 
         // Sets flag that triggers spinner in template
@@ -79,6 +88,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
         this.vehiclesService.getVehiclesData(inputtedValue)
       ),
       tap(() => {
+        // Controls final state of loading flags
         if (this.isLoadingTableData)
           this._isTableDataOnScreen = this._hasVinMatched;
         this.isLoadingTableData = false;
@@ -125,7 +135,8 @@ export class DataTableComponent implements OnInit, OnDestroy {
 
   vinMatchVehicleData(vin: string): boolean {
     return !!this._allVehiclesData?.find(
-      (vehicleData) => vehicleData.vin === vin
+      // redundancy check to uppercase, already handled in pipe
+      (vehicleData) => vehicleData.vin.toUpperCase() === vin.toUpperCase()
     );
   }
 }
