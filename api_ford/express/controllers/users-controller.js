@@ -1,4 +1,5 @@
 const User = require("../models/User");
+const bcrypt = require("bcrypt");
 
 const sanitizeUser = (user) => ({
   id: user.id,
@@ -20,9 +21,18 @@ const createNewUser = async (req, res) => {
   if (duplicateUser)
     return res.status(400).json({ message: "User already exists." });
 
-  const user = await User.create({ ...req.body });
+  try {
+    // encrypt password
+    const hashedPassword = await bcrypt.hash(password, 10);
+    // create new user
+    const newUser = { username, password: hashedPassword, email, fullName };
+    // store it in db
+    const createdUser = await User.create(newUser);
 
-  res.status(201).json(sanitizeUser(user));
+    res.status(201).json(sanitizeUser(createdUser));
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 };
 
 const getAllUsers = async (req, res) => {
@@ -45,7 +55,22 @@ const getUserById = async (req, res) => {
   res.json(sanitizeUser(user));
 };
 
-const verifyUser = async (req, res) => {};
+const verifyUser = async (req, res) => {
+  const { username, password } = req?.body;
+
+  if (!username || !password)
+    return res
+      .status(400)
+      .json({ message: "Username and password are required." });
+
+  const foundUser = await User.getOneByParams({ username });
+  if (!foundUser) return res.sendStatus(400); // Not registered
+
+  // evaluate password
+  const match = await bcrypt.compare(password, foundUser.password);
+  if (match) res.json({ message: `User ${username} logged in successfully` });
+  else res.sendStatus(400); // Wrong credentials
+};
 
 const updateUserById = async (req, res) => {
   const id = parseInt(req?.params?.id);
