@@ -1,4 +1,5 @@
 const express = require("express");
+const path = require("path");
 const cookieParser = require("cookie-parser");
 const verifyJWT = require("../middleware/verify-jwt");
 
@@ -10,7 +11,11 @@ module.exports = () => {
   app.use(express.json());
   app.use(cookieParser());
 
+  //serve static files
+  app.use("/", express.static(path.join(__dirname, "../public")));
+
   // routes
+  app.use("/", require("../routes/root"));
   app.use("/register", require("../routes/register"));
   app.use("/login", require("../routes/login"));
   app.use("/logout", require("../routes/logout"));
