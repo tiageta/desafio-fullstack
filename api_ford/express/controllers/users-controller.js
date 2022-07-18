@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 const sanitizeUser = (user) => ({
   id: user.id,
@@ -68,8 +69,27 @@ const verifyUser = async (req, res) => {
 
   // evaluate password
   const match = await bcrypt.compare(password, foundUser.password);
-  if (match) res.json({ message: `User ${username} logged in successfully` });
-  else res.sendStatus(400); // Wrong credentials
+  if (match) {
+    // create JWTs
+    const accessToken = jwt.sign(
+      { username: foundUser.username },
+      process.env.ACCESS_TOKEN_SECRET,
+      { expiresIn: "60s" }
+    );
+    const refreshToken = jwt.sign(
+      { username: foundUser.username },
+      process.env.REFRESH_TOKEN_SECRET,
+      { expiresIn: "1d" }
+    );
+    // update user refresh token in db
+    User.updateById(foundUser.id, { refreshToken });
+
+    res.cookie("jwt", refreshToken, {
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000,
+    });
+    res.json({ accessToken });
+  } else res.sendStatus(400); // Wrong credentials
 };
 
 const updateUserById = async (req, res) => {

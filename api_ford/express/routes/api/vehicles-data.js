@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const vehiclesDataController = require("../controllers/vehicles-data-controller");
+const vehiclesDataController = require("../../controllers/vehicles-data-controller");
 
 router
   .route("/")
