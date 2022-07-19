@@ -111,9 +111,9 @@ export class DataTableComponent implements OnInit, OnDestroy {
     { header: 'Código - Vin' },
     { header: 'Odômetro', data: 'odometer', unit: ' km' },
     { header: 'Nível de Combustível', data: 'fuelLevel', unit: ' %' },
-    { header: 'Status', data: 'status' },
-    { header: 'Lat.', data: 'lat' },
-    { header: 'Long.', data: 'long' },
+    { header: 'Status', data: 'vehicleStatus' },
+    { header: 'Lat.', data: 'latitude' },
+    { header: 'Long.', data: 'longitude' },
   ];
 
   constructor(private vehiclesService: VehiclesService) {}

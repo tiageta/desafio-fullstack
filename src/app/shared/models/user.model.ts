@@ -1,5 +1,8 @@
 export interface User {
-  id?: number | string;
-  name?: string;
+  id?: number;
+  username?: string;
   email?: string;
+  fullName?: string;
+  registerDate?: string;
+  refreshToken?: string;
 }

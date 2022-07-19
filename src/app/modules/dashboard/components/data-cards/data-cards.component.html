@@ -14,12 +14,8 @@
         >
           <ng-container *ngIf="!!v.vehicles">
             <option disabled selected value="-">-</option>
-            <option
-              *ngFor="let vehicle of v.vehicles"
-              [value]="vehicle.vehicle"
-            >
-              <!-- redudancy due to API naming convention -->
-              {{ vehicle.vehicle }}
+            <option *ngFor="let vehicle of v.vehicles" [value]="vehicle.model">
+              {{ vehicle.model }}
             </option>
           </ng-container>
         </select>
