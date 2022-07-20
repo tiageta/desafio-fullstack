@@ -10,14 +10,22 @@ const handleLogout = async (req, res) => {
   const refreshToken = cookies.jwt;
   const foundUser = await User.getOneByParams({ refreshToken });
   if (!foundUser) {
-    res.clearCookie("jwt", { httpOnly: true, secure: true, sameSite: "None" });
+    res.clearCookie("jwt", {
+      httpOnly: true,
+      secure: true,
+      sameSite: "None",
+    });
     return res.sendStatus(204);
   }
 
   // Delete token in db
   User.updateById(foundUser.id, { refreshToken: "" });
 
-  res.clearCookie("jwt", { httpOnly: true, secure: true, sameSite: "None" });
+  res.clearCookie("jwt", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "None",
+  });
   res.sendStatus(204);
 };
 

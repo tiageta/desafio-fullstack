@@ -10,7 +10,7 @@ const createNewVehicleData = async (req, res) => {
 
   const vehicleData = await VehicleData.create({ ...req.body });
 
-  res.status(201).json(vehicleData);
+  res.status(201).json({ data: vehicleData });
 };
 
 const getAllVehiclesData = async (req, res) => {
@@ -18,7 +18,7 @@ const getAllVehiclesData = async (req, res) => {
   if (!vehiclesData.length)
     return res.status(404).json({ message: "No vehicles data found." });
 
-  res.json(vehiclesData);
+  res.json({ data: vehiclesData });
 };
 
 const getVehicleDataById = async (req, res) => {
@@ -31,7 +31,7 @@ const getVehicleDataById = async (req, res) => {
       .status(404)
       .json({ message: `No vehicle data matches ID ${id}.` });
 
-  res.json(vehicleData);
+  res.json({ data: vehicleData });
 };
 
 const updateVehicleDataById = async (req, res) => {
@@ -45,7 +45,7 @@ const updateVehicleDataById = async (req, res) => {
       .json({ message: `No vehicle data matches ID ${id}.` });
 
   const updatedVehicleData = await VehicleData.updateById(id, req.body);
-  res.json(updatedVehicleData);
+  res.json({ data: updatedVehicleData });
 };
 
 const deleteVehicleDataById = async (req, res) => {
@@ -58,8 +58,8 @@ const deleteVehicleDataById = async (req, res) => {
       .status(404)
       .json({ message: `No vehicle data matches ID ${id}.` });
 
-  const deletedVehicleDataId = await VehicleData.deleteById(id);
-  res.json(deletedVehicleDataId);
+  const deletedVehicleData = await VehicleData.deleteById(id);
+  res.json({ data: deletedVehicleData });
 };
 
 module.exports = {

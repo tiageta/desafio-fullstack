@@ -55,11 +55,12 @@ class MySQL {
     }
   }
 
-  /** @returns ID of deleted record */
+  /** @returns Deleted record */
   async deleteById(id) {
     try {
+      const result = await this.getOneByParams({ id });
       await mysql.deleteById(id, this.#table);
-      return { id };
+      return result;
     } catch (error) {
       console.error(error);
     }
