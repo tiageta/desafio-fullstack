@@ -8,6 +8,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DataTableComponent } from './components/data-table/data-table.component';
 import { DataCardsComponent } from './components/data-cards/data-cards.component';
 import { CarImageComponent } from './components/car-image/car-image.component';
+import { DataChartsComponent } from './components/data-charts/data-charts.component';
 
 @NgModule({
   declarations: [
@@ -15,6 +16,7 @@ import { CarImageComponent } from './components/car-image/car-image.component';
     DataTableComponent,
     DataCardsComponent,
     CarImageComponent,
+    DataChartsComponent,
   ],
   imports: [
     CommonModule,

@@ -9,7 +9,7 @@ import { VehiclesService } from '../../services/vehicles.service';
   styleUrls: ['./data-cards.component.scss'],
 })
 export class DataCardsComponent {
-  @Output() selectVehicleEvent = new EventEmitter<string>();
+  @Output() selectVehicleEvent = new EventEmitter<Vehicle>();
   selectedVehicle = '-';
 
   vehicles$ = this.vehiclesService.getVehicles();
@@ -24,6 +24,11 @@ export class DataCardsComponent {
 
   private findSelectedVehicle(vehicles: Vehicles): Vehicle | undefined {
     return vehicles.find((vehicle) => vehicle.model === this.selectedVehicle);
+  }
+
+  emitSelectedVehicle(vehicles: Vehicles | null): void {
+    if (vehicles)
+      this.selectVehicleEvent.emit(this.findSelectedVehicle(vehicles));
   }
 
   getTotalSales(vehicles: Vehicles): number | string {
