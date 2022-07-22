@@ -1,21 +1,24 @@
-<div *ngIf="{ vehiclesData: vehiclesData$ | async } as vd">
-  <div class="table-responsive">
-    <table class="mb-0">
-      <thead>
-        <tr class="d-flex bg-primary text-white">
-          <th *ngFor="let tableField of tableFields" class="col" scope="col">
-            {{ tableField.header }}
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr class="d-flex pt-1 pb-1">
-          <td *ngFor="let tableField of tableFields" class="col">
-            <ng-container *ngIf="!tableField.data; else dataCol">
+<div
+  *ngIf="{ vehiclesData: vehiclesData$ | async } as vd"
+  class="table-responsive"
+>
+  <table class="mb-0">
+    <thead>
+      <tr class="d-flex bg-primary text-white">
+        <th *ngFor="let tableField of tableFields" class="col" scope="col">
+          {{ tableField.header }}
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="d-flex pt-1 pb-1">
+        <td *ngFor="let tableField of tableFields" class="col">
+          <ng-container *ngIf="!tableField.data; else dataCol">
+            <div class="input-field d-flex gap-3">
               <input
                 #vinInput
                 list="dataVehicles"
-                class="form-control-sm"
+                class="form-control-sm flex-grow-1"
                 type="text"
                 [formControl]="searchedVin"
               />
@@ -24,41 +27,52 @@
                   {{ vehicleData.vin }}
                 </option>
               </datalist>
-            </ng-container>
-            <ng-template #dataCol>
-              <ng-container *ngIf="vd.vehiclesData; else placeholder">
+              <div class="crud-buttons d-flex gap-1 align-items-center">
+                <button class="btn btn-success">
+                  <i class="fa fa-solid fa-plus fa-sm"></i>
+                </button>
+                <button class="btn btn-secondary">
+                  <i class="fa fa-solid fa-refresh fa-sm"></i>
+                </button>
+                <button class="btn btn-danger">
+                  <i class="fa fa-solid fa-trash fa-sm"></i>
+                </button>
+              </div>
+            </div>
+          </ng-container>
+          <ng-template #dataCol>
+            <ng-container *ngIf="vd.vehiclesData; else placeholder">
+              <span
+                *ngIf="!isLoadingTableData; else spinnerBlock"
+                class="fw-bold"
+              >
+                {{
+                  getDataFromVehicle(tableField.data, vd.vehiclesData).concat(
+                    tableField.unit ?? ""
+                  )
+                }}</span
+              >
+              <ng-template #spinnerBlock>
                 <span
-                  *ngIf="!isLoadingTableData; else spinnerBlock"
-                  class="fw-bold"
-                >
-                  {{
-                    getDataFromVehicle(tableField.data, vd.vehiclesData).concat(
-                      tableField.unit ?? ""
-                    )
-                  }}</span
-                >
-                <ng-template #spinnerBlock>
-                  <span
-                    @delaySpinner
-                    class="spinner-border spinner-border-sm"
-                    role="status"
-                  ></span>
-                </ng-template>
-              </ng-container>
-              <ng-template #placeholder>
-                <div class="placeholder-glow">
-                  <span class="placeholder col-2">&nbsp;</span>
-                </div>
+                  @delaySpinner
+                  class="spinner-border spinner-border-sm"
+                  role="status"
+                ></span>
               </ng-template>
+            </ng-container>
+            <ng-template #placeholder>
+              <div class="placeholder-glow">
+                <span class="placeholder col-2">&nbsp;</span>
+              </div>
             </ng-template>
-          </td>
-        </tr>
-      </tbody>
-      <tfoot>
-        <tr>
-          <td colspan="100%" class="bg-primary"></td>
-        </tr>
-      </tfoot>
-    </table>
-  </div>
+          </ng-template>
+        </td>
+      </tr>
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="100%" class="bg-primary"></td>
+      </tr>
+    </tfoot>
+  </table>
 </div>
