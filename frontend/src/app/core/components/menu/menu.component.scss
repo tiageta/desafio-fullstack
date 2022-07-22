@@ -28,16 +28,18 @@
   }
 
   .menu {
+    overflow: auto;
     background: white;
     z-index: 1;
     position: relative;
 
     &.mobile {
       min-height: 35vh;
+      max-height: 50vh;
       width: 100vw;
     }
     &.desktop {
-      min-height: 100vh;
+      height: 100vh;
       width: 20em;
       max-width: 100vw;
     }

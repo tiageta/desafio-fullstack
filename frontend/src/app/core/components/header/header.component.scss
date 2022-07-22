@@ -4,6 +4,7 @@
 header {
   min-height: 10vh;
   margin-block: auto;
+  border-bottom: 1px solid #ddd;
   .account-popover {
     --popover-triangle-size: 15px;
     position: absolute;

@@ -1,5 +1,5 @@
-<div *ngIf="user$ | async as user">
-  <div *ngIf="isUserLoggedIn()">
+<ng-container *ngIf="user$ | async as user">
+  <ng-container *ngIf="isUserLoggedIn()">
     <header class="sticky-top">
       <nav class="navbar navbar-light bg-white">
         <div class="container-fluid">
@@ -43,5 +43,5 @@
         </div>
       </nav>
     </header>
-  </div>
-</div>
+  </ng-container>
+</ng-container>
