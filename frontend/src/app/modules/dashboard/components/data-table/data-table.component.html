@@ -10,10 +10,12 @@
         </th>
       </tr>
     </thead>
+
     <tbody>
       <tr class="d-flex pt-1 pb-1">
         <td *ngFor="let tableField of tableFields" class="col">
-          <ng-container *ngIf="!tableField.data; else dataCol">
+          <!-- Input field -->
+          <ng-container *ngIf="!tableField.type; else dataCol">
             <div class="input-field d-flex gap-3">
               <input
                 #vinInput
@@ -27,6 +29,7 @@
                   {{ vehicleData.vin }}
                 </option>
               </datalist>
+
               <div class="crud-buttons d-flex gap-1 align-items-center">
                 <button class="btn btn-success">
                   <i class="fa fa-solid fa-plus fa-sm"></i>
@@ -40,18 +43,21 @@
               </div>
             </div>
           </ng-container>
+
+          <!-- Data fields -->
           <ng-template #dataCol>
             <ng-container *ngIf="vd.vehiclesData; else placeholder">
-              <span
-                *ngIf="!isLoadingTableData; else spinnerBlock"
-                class="fw-bold"
-              >
-                {{
-                  getDataFromVehicle(tableField.data, vd.vehiclesData).concat(
-                    tableField.unit ?? ""
-                  )
-                }}</span
-              >
+              <ng-container *ngIf="!isLoadingTableData; else spinnerBlock">
+                <span class="fw-bold">
+                  {{
+                    getDataFromVehicle(tableField.type, vd.vehiclesData).concat(
+                      tableField.unit ?? ""
+                    )
+                  }}</span
+                >
+              </ng-container>
+
+              <!-- Loading effect for data fields -->
               <ng-template #spinnerBlock>
                 <span
                   @delaySpinner
@@ -60,6 +66,8 @@
                 ></span>
               </ng-template>
             </ng-container>
+
+            <!-- Placeholder for data fields -->
             <ng-template #placeholder>
               <div class="placeholder-glow">
                 <span class="placeholder col-2">&nbsp;</span>

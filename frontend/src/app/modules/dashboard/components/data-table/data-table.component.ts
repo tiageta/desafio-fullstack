@@ -68,7 +68,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
         return upperCaseInputtedValue;
       }),
       tap((inputtedValue) => {
-        // Store flag locally as to not depend o input value later in pipe
+        // Store flag locally as to not depend on input value later in pipe
         this._hasVinMatched =
           inputtedValue.length === VIN_LENGTH &&
           this.vinMatchVehicleData(inputtedValue);
@@ -109,11 +109,11 @@ export class DataTableComponent implements OnInit, OnDestroy {
 
   tableFields: TableFields = [
     { header: 'Código - Vin' },
-    { header: 'Odômetro', data: 'odometer', unit: ' km' },
-    { header: 'Nível de Combustível', data: 'fuelLevel', unit: ' %' },
-    { header: 'Status', data: 'vehicleStatus' },
-    { header: 'Lat.', data: 'latitude' },
-    { header: 'Long.', data: 'longitude' },
+    { header: 'Odômetro', type: 'odometer', unit: ' km' },
+    { header: 'Nível de Combustível', type: 'fuelLevel', unit: ' %' },
+    { header: 'Status', type: 'vehicleStatus' },
+    { header: 'Lat.', type: 'latitude' },
+    { header: 'Long.', type: 'longitude' },
   ];
 
   constructor(private vehiclesService: VehiclesService) {}
@@ -128,15 +128,15 @@ export class DataTableComponent implements OnInit, OnDestroy {
     this._allVehiclesDataSub.unsubscribe();
   }
 
-  getDataFromVehicle(data: TableField['data'], vehiclesData: VehiclesData) {
-    if (!data || vehiclesData.length !== 1) return '-'; // still no match
-    return vehiclesData[0][data].toString();
+  getDataFromVehicle(type: TableField['type'], vehiclesData: VehiclesData) {
+    if (!type || vehiclesData.length !== 1) return '-'; // still no match
+    return vehiclesData[0][type]?.toString() ?? '-';
   }
 
   vinMatchVehicleData(vin: string): boolean {
     return !!this._allVehiclesData?.find(
       // redundancy check to uppercase, already handled in pipe
-      (vehicleData) => vehicleData.vin.toUpperCase() === vin.toUpperCase()
+      (vehicleData) => vehicleData.vin?.toUpperCase() === vin.toUpperCase()
     );
   }
 }

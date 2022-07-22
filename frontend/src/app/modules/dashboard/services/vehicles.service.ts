@@ -32,7 +32,7 @@ export class VehiclesService {
       map((vehiclesData) => {
         if (vin)
           return vehiclesData.filter((vehicleData) =>
-            vehicleData.vin.includes(vin)
+            vehicleData.vin?.includes(vin)
           );
         return vehiclesData;
       })
