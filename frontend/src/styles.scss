@@ -1,1 +1,7 @@
 /* You can add global styles to this file, and also import other style files */
+
+// Provided by directive to lock body
+.scroll-block {
+  height: 100vh !important;
+  overflow: hidden !important;
+}
