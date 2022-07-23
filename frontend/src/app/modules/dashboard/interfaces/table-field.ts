@@ -4,6 +4,7 @@ export interface TableField {
   header: string;
   type?: keyof VehicleData;
   unit?: string;
+  value?: string;
 }
 
 export type TableFields = TableField[];

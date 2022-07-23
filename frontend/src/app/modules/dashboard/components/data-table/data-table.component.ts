@@ -40,6 +40,7 @@ const INPUT_DEBOUNCE_MS = 200;
 export class DataTableComponent implements OnInit, OnDestroy {
   private _allVehiclesData: VehiclesData | undefined;
   private _allVehiclesDataSub = new Subscription();
+  private _filteredVehicleDataSub = new Subscription();
   private _hasVinMatched = false;
   private _isTableDataOnScreen = false;
 
@@ -88,6 +89,9 @@ export class DataTableComponent implements OnInit, OnDestroy {
         this.vehiclesService.getVehiclesData(inputtedValue)
       ),
       tap(() => {
+        // Clears table if no match
+        if (!this._hasVinMatched)
+          this.tableFields.forEach((field) => (field.value = ''));
         // Controls final state of loading flags
         if (this.isLoadingTableData)
           this._isTableDataOnScreen = this._hasVinMatched;
@@ -109,11 +113,16 @@ export class DataTableComponent implements OnInit, OnDestroy {
 
   tableFields: TableFields = [
     { header: 'Código - Vin' },
-    { header: 'Odômetro', type: 'odometer', unit: ' km' },
-    { header: 'Nível de Combustível', type: 'fuelLevel', unit: ' %' },
-    { header: 'Status', type: 'vehicleStatus' },
-    { header: 'Lat.', type: 'latitude' },
-    { header: 'Long.', type: 'longitude' },
+    { header: 'Odômetro', type: 'odometer', value: '', unit: ' km' },
+    {
+      header: 'Nível de Combustível',
+      type: 'fuelLevel',
+      value: '',
+      unit: ' %',
+    },
+    { header: 'Status', type: 'vehicleStatus', value: '' },
+    { header: 'Lat.', type: 'latitude', value: '' },
+    { header: 'Long.', type: 'longitude', value: '' },
   ];
 
   constructor(private vehiclesService: VehiclesService) {}
@@ -122,15 +131,22 @@ export class DataTableComponent implements OnInit, OnDestroy {
     this._allVehiclesDataSub = this.allVehiclesData$.subscribe(
       (allVehiclesData) => (this._allVehiclesData = allVehiclesData)
     );
+
+    // Populates table fields with filtered data
+    this._filteredVehicleDataSub = this.filteredVehiclesData$.subscribe(
+      (filteredVehiclesData) => {
+        if (filteredVehiclesData.length !== 1) return;
+        this.tableFields.forEach((field) => {
+          if (field.type)
+            field.value = filteredVehiclesData[0][field.type]?.toString() ?? '';
+        });
+      }
+    );
   }
 
   ngOnDestroy(): void {
     this._allVehiclesDataSub.unsubscribe();
-  }
-
-  getDataFromVehicle(type: TableField['type'], vehiclesData: VehiclesData) {
-    if (!type || vehiclesData.length !== 1) return '-'; // still no match
-    return vehiclesData[0][type]?.toString() ?? '-';
+    this._filteredVehicleDataSub.unsubscribe();
   }
 
   vinMatchVehicleData(vin: string): boolean {

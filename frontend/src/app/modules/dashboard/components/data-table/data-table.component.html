@@ -48,20 +48,23 @@
           <ng-template #dataCol>
             <ng-container *ngIf="vd.vehiclesData; else placeholder">
               <ng-container *ngIf="!isLoadingTableData; else spinnerBlock">
-                <span class="fw-bold">
-                  {{
-                    getDataFromVehicle(tableField.type, vd.vehiclesData).concat(
-                      tableField.unit ?? ""
-                    )
-                  }}</span
-                >
+                <div class="data-field input-group flex-nowrap">
+                  <input
+                    class="fw-bold w-100 form-control-sm text-end"
+                    placeholder="-"
+                    [(ngModel)]="tableField.value"
+                  />
+                  <span *ngIf="!!tableField.unit" class="input-group-text unit">
+                    {{ tableField.unit }}
+                  </span>
+                </div>
               </ng-container>
 
               <!-- Loading effect for data fields -->
               <ng-template #spinnerBlock>
                 <span
                   @delaySpinner
-                  class="spinner-border spinner-border-sm"
+                  class="spinner-border spinner-border-sm d-block m-auto"
                   role="status"
                 ></span>
               </ng-template>
@@ -70,7 +73,7 @@
             <!-- Placeholder for data fields -->
             <ng-template #placeholder>
               <div class="placeholder-glow">
-                <span class="placeholder col-2">&nbsp;</span>
+                <span class="placeholder col-12">&nbsp;</span>
               </div>
             </ng-template>
           </ng-template>

@@ -16,8 +16,18 @@ table {
       button {
         display: flex;
         padding: 0.5em;
-        height: fit-content;
       }
+    }
+  }
+
+  .data-field {
+    .unit {
+      position: relative;
+      z-index: -1;
+      font-size: 0.8em;
+      font-weight: 600;
+      color: #444;
+      padding-inline: 0.2em;
     }
   }
 
@@ -50,4 +60,6 @@ table {
 
 .fa-sm {
   font-size: 0.75em;
+  height: 0.75em;
+  width: 0.75em;
 }
