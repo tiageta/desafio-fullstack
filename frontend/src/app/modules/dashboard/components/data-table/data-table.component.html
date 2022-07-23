@@ -31,13 +31,13 @@
               </datalist>
 
               <div class="crud-buttons d-flex gap-1 align-items-center">
-                <button class="btn btn-success">
+                <button class="btn btn-success" [disabled]="!mayCreate">
                   <i class="fa fa-solid fa-plus fa-sm"></i>
                 </button>
-                <button class="btn btn-secondary">
+                <button class="btn btn-secondary" [disabled]="!mayUpdate">
                   <i class="fa fa-solid fa-refresh fa-sm"></i>
                 </button>
-                <button class="btn btn-danger">
+                <button class="btn btn-danger" [disabled]="!mayDelete">
                   <i class="fa fa-solid fa-trash fa-sm"></i>
                 </button>
               </div>
@@ -53,6 +53,8 @@
                     class="fw-bold w-100 form-control-sm text-end"
                     placeholder="-"
                     [(ngModel)]="tableField.value"
+                    (ngModelChange)="handleDirtyField(tableField)"
+                    [ngClass]="{ 'text-success': tableField.dirty }"
                   />
                   <span *ngIf="!!tableField.unit" class="input-group-text unit">
                     {{ tableField.unit }}

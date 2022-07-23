@@ -5,6 +5,7 @@ export interface TableField {
   type?: keyof VehicleData;
   unit?: string;
   value?: string;
+  dirty?: boolean;
 }
 
 export type TableFields = TableField[];

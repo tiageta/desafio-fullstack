@@ -45,6 +45,9 @@ export class DataTableComponent implements OnInit, OnDestroy {
   private _isTableDataOnScreen = false;
 
   isLoadingTableData = false;
+  mayCreate = false;
+  mayUpdate = false;
+  mayDelete = false;
 
   searchedVin = new FormControl(
     { value: '', disabled: true },
@@ -74,6 +77,13 @@ export class DataTableComponent implements OnInit, OnDestroy {
           inputtedValue.length === VIN_LENGTH &&
           this.vinMatchVehicleData(inputtedValue);
 
+        // Enables create button
+        this.mayCreate =
+          inputtedValue.length === VIN_LENGTH && !this._hasVinMatched;
+
+        // Enables delete button
+        this.mayDelete = this._hasVinMatched;
+
         // Unfocus input field as to not popup datalist on data load
         if (this._hasVinMatched && this.vinInputElement) {
           this.vinInputElement.nativeElement.blur();
@@ -89,9 +99,14 @@ export class DataTableComponent implements OnInit, OnDestroy {
         this.vehiclesService.getVehiclesData(inputtedValue)
       ),
       tap(() => {
-        // Clears table if no match
-        if (!this._hasVinMatched)
-          this.tableFields.forEach((field) => (field.value = ''));
+        if (!this._hasVinMatched) {
+          // Disables update button
+          this.mayUpdate = false;
+          // Clears table if no match
+          this.tableFields.forEach((field) => {
+            if (!field.dirty) field.value = ''; // keeps altered values
+          });
+        }
         // Controls final state of loading flags
         if (this.isLoadingTableData)
           this._isTableDataOnScreen = this._hasVinMatched;
@@ -137,8 +152,9 @@ export class DataTableComponent implements OnInit, OnDestroy {
       (filteredVehiclesData) => {
         if (filteredVehiclesData.length !== 1) return;
         this.tableFields.forEach((field) => {
-          if (field.type)
-            field.value = filteredVehiclesData[0][field.type]?.toString() ?? '';
+          if (!field.type) return;
+          field.value = filteredVehiclesData[0][field.type]?.toString() ?? '';
+          field.dirty = false;
         });
       }
     );
@@ -154,5 +170,10 @@ export class DataTableComponent implements OnInit, OnDestroy {
       // redundancy check to uppercase, already handled in pipe
       (vehicleData) => vehicleData.vin?.toUpperCase() === vin.toUpperCase()
     );
+  }
+
+  handleDirtyField(tableField: TableField) {
+    tableField.dirty = true;
+    if (this._hasVinMatched) this.mayUpdate = true; // Enables update button
   }
 }
