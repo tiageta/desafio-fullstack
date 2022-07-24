@@ -41,20 +41,32 @@ export class VehiclesDataService {
     vin: string,
     newValues: VehicleData
   ): Promise<Observable<HttpResponse<VehicleData>>> {
-    const [vehicleData] = await firstValueFrom(this.getVehiclesData(vin));
-    const id = vehicleData.id;
-    return this.http.post(`${API}/vehiclesData/${id}`, newValues, {
-      observe: 'response',
-    });
+    try {
+      const vehiclesData = await firstValueFrom(this.getVehiclesData(vin));
+      if (vehiclesData.length !== 1) throw 'VIN does not match a record.';
+
+      const id = vehiclesData[0].id;
+      return this.http.patch(`${API}/vehiclesData/${id}`, newValues, {
+        observe: 'response',
+      });
+    } catch (err) {
+      throw err;
+    }
   }
 
   async deleteVehicleData(
     vin: string
   ): Promise<Observable<HttpResponse<VehicleData>>> {
-    const [vehicleData] = await firstValueFrom(this.getVehiclesData(vin));
-    const id = vehicleData.id;
-    return this.http.delete(`${API}/vehiclesData/${id}`, {
-      observe: 'response',
-    });
+    try {
+      const vehiclesData = await firstValueFrom(this.getVehiclesData(vin));
+      if (vehiclesData.length !== 1) throw 'VIN does not match a record.';
+
+      const id = vehiclesData[0].id;
+      return this.http.delete(`${API}/vehiclesData/${id}`, {
+        observe: 'response',
+      });
+    } catch (err) {
+      throw err;
+    }
   }
 }
