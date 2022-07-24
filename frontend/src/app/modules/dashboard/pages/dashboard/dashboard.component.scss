@@ -9,9 +9,13 @@
     align-items: center;
     #image {
       grid-column: 1 / 3;
+      width: 100%;
+      height: 100%;
     }
     #charts {
       grid-column: 3 / 5;
+      width: 100%;
+      height: 100%;
     }
   }
 }
