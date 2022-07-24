@@ -198,11 +198,19 @@ export class DataTableComponent implements OnInit, OnDestroy {
     );
   }
 
-  handleDirtyField(tableField: TableField) {
-    tableField.dirty = true;
-    if (this._hasVinMatched) this.mayUpdate = true; // Enables update button
+  handleDirtyField(tableField: TableField): void {
+    const originalValue = tableField.type
+      ? this._filteredVehicleData[tableField.type]
+      : undefined;
+    tableField.dirty = this.getFieldValue(tableField.type) !== originalValue;
+
+    this.mayUpdate = this._hasVinMatched && this.isAnyFieldDirty(); // Enables update button
     this.refreshCreateOptions();
     this.refreshUpdateOptions();
+  }
+
+  isAnyFieldDirty(): boolean {
+    return this.tableFields.some((field) => field.dirty);
   }
 
   refreshCreateOptions(): void {
