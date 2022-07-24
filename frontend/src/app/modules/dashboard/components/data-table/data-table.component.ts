@@ -52,6 +52,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
   private _hasVinMatched = false;
 
   isLoadingTableData = false;
+  isWaitingResponse = false;
   mayCreate = false;
   mayUpdate = false;
   mayDelete = false;

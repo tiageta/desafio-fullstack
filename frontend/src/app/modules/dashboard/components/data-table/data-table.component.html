@@ -1,3 +1,5 @@
+<app-loading *ngIf="isWaitingResponse"></app-loading>
+
 <div
   *ngIf="{ vehiclesData: vehiclesData$ | async } as vd"
   class="table-responsive"
