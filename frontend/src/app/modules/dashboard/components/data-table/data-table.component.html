@@ -31,13 +31,25 @@
               </datalist>
 
               <div class="crud-buttons d-flex gap-1 align-items-center">
-                <button class="btn btn-success" [disabled]="!mayCreate">
+                <button
+                  class="btn btn-success"
+                  [disabled]="!mayCreate"
+                  (click)="openModal('create')"
+                >
                   <i class="fa fa-solid fa-plus fa-sm"></i>
                 </button>
-                <button class="btn btn-secondary" [disabled]="!mayUpdate">
+                <button
+                  class="btn btn-secondary"
+                  [disabled]="!mayUpdate"
+                  (click)="openModal('update')"
+                >
                   <i class="fa fa-solid fa-refresh fa-sm"></i>
                 </button>
-                <button class="btn btn-danger" [disabled]="!mayDelete">
+                <button
+                  class="btn btn-danger"
+                  [disabled]="!mayDelete"
+                  (click)="openModal('delete')"
+                >
                   <i class="fa fa-solid fa-trash fa-sm"></i>
                 </button>
               </div>

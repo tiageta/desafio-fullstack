@@ -1,0 +1,35 @@
+<div class="modal-header">
+  <h4 class="modal-title">{{ modalOptions?.title ?? "" }}</h4>
+  <button
+    type="button"
+    class="btn-close"
+    aria-label="Close"
+    (click)="activeModel.dismiss('Cross click')"
+  ></button>
+</div>
+<div class="modal-body">
+  <div
+    *ngFor="let line of modalOptions?.body"
+    [ngClass]="{ 'fw-bold': isBold(line) }"
+  >
+    {{ displayLine(line) }}
+  </div>
+</div>
+<div class="modal-footer">
+  <button
+    *ngIf="modalOptions?.secondary"
+    type="button"
+    class="btn btn-light"
+    (click)="activeModel.close('Close click')"
+  >
+    {{ modalOptions?.secondary }}
+  </button>
+  <button
+    *ngIf="modalOptions?.primary"
+    type="button"
+    class="btn btn-primary"
+    (click)="activeModel.close('Close click')"
+  >
+    {{ modalOptions?.primary }}
+  </button>
+</div>
