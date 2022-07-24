@@ -17,11 +17,11 @@ import {
   switchMap,
   tap,
 } from 'rxjs';
-import { ModalComponent } from 'src/app/shared/components/modal/modal.component';
+import { ModalComponent } from '../modal/modal.component';
 import {
-  ModalBodyObject,
   ModalOptions,
-} from 'src/app/shared/models/modal-options.model';
+  ModalBodyObject,
+} from '../../interfaces/modal-options.model';
 import { VehicleData, VehiclesData } from 'src/app/shared/models/vehicle.model';
 import { TableField, TableFields } from '../../interfaces/table-field';
 import { VehiclesDataService } from '../../services/vehicles-data.service';
