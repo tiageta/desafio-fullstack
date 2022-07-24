@@ -1,44 +1,47 @@
 <div class="modal-header">
-  <h4 class="modal-title">{{ modalOptions?.title ?? "" }}</h4>
+  <h4 class="modal-title">{{ getTitle() }}</h4>
   <button
     type="button"
     class="btn-close"
     aria-label="Close"
-    (click)="activeModel.dismiss('Cross click')"
+    (click)="activeModel.dismiss()"
   ></button>
 </div>
 <div class="modal-body text-break">
+  <div *ngIf="isConfirmation; else successMessage">
+    Você tem certeza que deseja
+    <strong class="fst-italic">{{ getAction() }}</strong> o item:
+  </div>
+  <ng-template #successMessage>
+    <div *ngIf="isSuccess; else errorMessage">
+      Os dados foram
+      <strong class="fst-italic">{{ getAction() }}</strong> com sucesso.
+    </div>
+  </ng-template>
+  <ng-template #errorMessage>
+    Houve uma falha na operação. Verifique os dados e tente novamente.
+  </ng-template>
   <div
-    *ngFor="let line of modalOptions?.body"
-    [ngClass]="{ 'fw-bold': isBold(line) }"
+    *ngFor="let key of getKeys(modalOptions?.body)"
+    [ngClass]="{ 'fw-bold': isBold(key) }"
     class="container-fluid"
   >
-    <div *ngIf="isString(line); else objectTable" class="mb-2">
-      {{ line ?? "" }}
+    <div class="row">
+      <div class="col fst-italic">{{ getLabel(key) }}</div>
+      <div class="col">{{ getValue(key) }}</div>
     </div>
-    <ng-template #objectTable>
-      <div class="row">
-        <div class="col fst-italic">{{ getKey(line) }}</div>
-        <div class="col">{{ getValue(line) }}</div>
-      </div>
-    </ng-template>
   </div>
 </div>
 <div class="modal-footer">
-  <button
-    *ngIf="modalOptions?.secondary"
-    type="button"
-    class="btn btn-light"
-    (click)="activeModel.close('Close click')"
-  >
-    {{ modalOptions?.secondary }}
+  <button type="button" class="btn btn-light" (click)="activeModel.dismiss()">
+    {{ isConfirmation ? "Não" : "Fechar" }}
   </button>
   <button
-    *ngIf="modalOptions?.primary"
+    *ngIf="isConfirmation"
     type="button"
     class="btn btn-primary"
-    (click)="activeModel.close('Close click')"
+    (click)="activeModel.close()"
   >
-    {{ modalOptions?.primary }}
+    Sim
   </button>
 </div>

@@ -1,14 +1,17 @@
-export interface ModalOptions {
-  title?: string;
-  body?: Array<string | ModalBodyObject>;
-  primary?: string;
-  secondary?: string;
-}
+import { VehicleData } from 'src/app/shared/models/vehicle.model';
 
-export interface ModalBodyObject {
-  key: string;
-  value: string;
-  options: {
-    bold: boolean;
+export type ModalOptions = {
+  bold?: {
+    [key in keyof VehicleData]?: boolean;
   };
-}
+} & {
+  action:
+    | 'create'
+    | 'update'
+    | 'delete'
+    | 'created'
+    | 'updated'
+    | 'deleted'
+    | 'error';
+  body?: VehicleData;
+};

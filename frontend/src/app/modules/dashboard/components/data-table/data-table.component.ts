@@ -18,10 +18,7 @@ import {
   tap,
 } from 'rxjs';
 import { ModalComponent } from '../modal/modal.component';
-import {
-  ModalOptions,
-  ModalBodyObject,
-} from '../../interfaces/modal-options.model';
+import { ModalOptions } from '../../interfaces/modal-options.model';
 import { VehicleData, VehiclesData } from 'src/app/shared/models/vehicle.model';
 import { TableField, TableFields } from '../../interfaces/table-field';
 import { VehiclesDataService } from '../../services/vehicles-data.service';
@@ -147,11 +144,6 @@ export class DataTableComponent implements OnInit, OnDestroy {
     { header: 'Long.', type: 'longitude', value: '' },
   ];
 
-  modalOptions: ModalOptions = {
-    title: 'Confirmação',
-    primary: 'Sim',
-    secondary: 'Não',
-  };
   createOptions: ModalOptions | undefined;
   updateOptions: ModalOptions | undefined;
   deleteOptions: ModalOptions | undefined;
@@ -202,96 +194,50 @@ export class DataTableComponent implements OnInit, OnDestroy {
 
   refreshCreateOptions(): void {
     this.createOptions = {
-      ...this.modalOptions,
-      body: [
-        'Você tem certeza que deseja criar o item:',
-        { key: 'VIN', value: this._inputtedVin } as ModalBodyObject,
-        {
-          key: 'Odômetro',
-          value: this.getFieldValue('odometer'),
-        } as ModalBodyObject,
-        {
-          key: 'Nível de Combustível',
-          value: this.getFieldValue('fuelLevel'),
-        } as ModalBodyObject,
-        {
-          key: 'Status',
-          value: this.getFieldValue('vehicleStatus'),
-        } as ModalBodyObject,
-        {
-          key: 'Lat.',
-          value: this.getFieldValue('latitude'),
-        } as ModalBodyObject,
-        {
-          key: 'Long.',
-          value: this.getFieldValue('longitude'),
-        } as ModalBodyObject,
-      ],
+      action: 'create',
+      body: {
+        vin: this._inputtedVin,
+        odometer: this.getFieldValue('odometer'),
+        fuelLevel: this.getFieldValue('fuelLevel'),
+        vehicleStatus: this.getFieldValue('vehicleStatus'),
+        latitude: this.getFieldValue('latitude'),
+        longitude: this.getFieldValue('longitude'),
+      },
     };
   }
 
   refreshUpdateOptions(): void {
     this.updateOptions = {
-      ...this.modalOptions,
-      body: [
-        'Você tem certeza que deseja atualizar o item:',
-        { key: 'VIN', value: this._filteredVehicleData.vin } as ModalBodyObject,
-        {
-          key: 'Odômetro',
-          value: this.getFieldValue('odometer'),
-          options: { bold: this.isFieldDirty('odometer') },
-        } as ModalBodyObject,
-        {
-          key: 'Nível de Combustível',
-          value: this.getFieldValue('fuelLevel'),
-          options: { bold: this.isFieldDirty('fuelLevel') },
-        } as ModalBodyObject,
-        {
-          key: 'Status',
-          value: this.getFieldValue('vehicleStatus'),
-          options: { bold: this.isFieldDirty('vehicleStatus') },
-        } as ModalBodyObject,
-        {
-          key: 'Lat.',
-          value: this.getFieldValue('latitude'),
-          options: { bold: this.isFieldDirty('latitude') },
-        } as ModalBodyObject,
-        {
-          key: 'Long.',
-          value: this.getFieldValue('longitude'),
-          options: { bold: this.isFieldDirty('longitude') },
-        } as ModalBodyObject,
-      ],
+      action: 'update',
+      body: {
+        vin: this._filteredVehicleData.vin ?? '',
+        odometer: this.getFieldValue('odometer'),
+        fuelLevel: this.getFieldValue('fuelLevel'),
+        vehicleStatus: this.getFieldValue('vehicleStatus'),
+        latitude: this.getFieldValue('latitude'),
+        longitude: this.getFieldValue('longitude'),
+      },
+      bold: {
+        odometer: this.isFieldDirty('odometer'),
+        fuelLevel: this.isFieldDirty('fuelLevel'),
+        vehicleStatus: this.isFieldDirty('vehicleStatus'),
+        latitude: this.isFieldDirty('latitude'),
+        longitude: this.isFieldDirty('longitude'),
+      },
     };
   }
 
   refreshDeleteOptions(): void {
     this.deleteOptions = {
-      ...this.modalOptions,
-      body: [
-        'Você tem certeza que deseja deletar o item:',
-        { key: 'VIN', value: this._filteredVehicleData.vin } as ModalBodyObject,
-        {
-          key: 'Odômetro',
-          value: this._filteredVehicleData.odometer ?? '',
-        } as ModalBodyObject,
-        {
-          key: 'Nível de Combustível',
-          value: this._filteredVehicleData.fuelLevel ?? '',
-        } as ModalBodyObject,
-        {
-          key: 'Status',
-          value: this._filteredVehicleData.vehicleStatus ?? '',
-        } as ModalBodyObject,
-        {
-          key: 'Lat.',
-          value: this._filteredVehicleData.latitude ?? '',
-        } as ModalBodyObject,
-        {
-          key: 'Long.',
-          value: this._filteredVehicleData.longitude ?? '',
-        } as ModalBodyObject,
-      ],
+      action: 'delete',
+      body: {
+        vin: this._filteredVehicleData.vin ?? '',
+        odometer: this._filteredVehicleData.odometer ?? '',
+        fuelLevel: this._filteredVehicleData.fuelLevel ?? '',
+        vehicleStatus: this._filteredVehicleData.vehicleStatus ?? '',
+        latitude: this._filteredVehicleData.latitude ?? '',
+        longitude: this._filteredVehicleData.longitude ?? '',
+      },
     };
   }
 
@@ -306,14 +252,11 @@ export class DataTableComponent implements OnInit, OnDestroy {
   }
 
   openModal(method: 'create' | 'update' | 'delete'): void {
-    const modalOptions =
-      method === 'create'
-        ? this.createOptions
-        : method === 'update'
-        ? this.updateOptions
-        : method === 'delete'
-        ? this.deleteOptions
-        : undefined;
+    const modalOptions = [
+      this.createOptions,
+      this.updateOptions,
+      this.deleteOptions,
+    ].find((options) => options?.action === method);
 
     if (!modalOptions) return;
 
