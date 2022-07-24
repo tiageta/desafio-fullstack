@@ -1,4 +1,5 @@
 import { animate, style, transition, trigger } from '@angular/animations';
+import { HttpResponse } from '@angular/common/http';
 import {
   Component,
   ElementRef,
@@ -10,9 +11,11 @@ import { FormControl, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import {
   debounceTime,
+  finalize,
   map,
   merge,
   Observable,
+  Observer,
   repeat,
   Subject,
   Subscription,
@@ -283,5 +286,70 @@ export class DataTableComponent implements OnInit, OnDestroy {
 
     const modalRef = this.modalService.open(ModalComponent, { centered: true });
     modalRef.componentInstance.modalOptions = modalOptions;
+    modalRef.result.then(
+      () => {
+        this.isWaitingResponse = true;
+        if (Object.is(modalOptions, this.createOptions)) this.createHandle();
+        else if (Object.is(modalOptions, this.updateOptions))
+          this.updateHandle();
+        else this.deleteHandle(); // already returned if neither above
+      },
+      () => {} // lib throws an error if onreject is omitted; handles modal dismiss
+    );
+  }
+
+  createHandle(): void {
+    const newVehicleData = this.createOptions?.body ?? {};
+    this.vehiclesDataService
+      .createVehicleData(newVehicleData)
+      .pipe(finalize(() => (this.isWaitingResponse = false)))
+      .subscribe(this.httpHandle('created'));
+  }
+
+  updateHandle() {
+    const updatedVehicleData = this.updateOptions?.body ?? {};
+    if (!updatedVehicleData.vin) return;
+    this.vehiclesDataService
+      .updateVehicleData(updatedVehicleData.vin, updatedVehicleData)
+      .then((observable) =>
+        observable
+          .pipe(finalize(() => (this.isWaitingResponse = false)))
+          .subscribe(this.httpHandle('updated'))
+      )
+      .catch(() => this.errorHandle());
+  }
+
+  deleteHandle() {
+    const deletedVehicleData = this.deleteOptions?.body ?? {};
+    if (!deletedVehicleData.vin) return;
+    this.vehiclesDataService
+      .deleteVehicleData(deletedVehicleData.vin)
+      .then((observable) =>
+        observable
+          .pipe(finalize(() => (this.isWaitingResponse = false)))
+          .subscribe(this.httpHandle('deleted'))
+      )
+      .catch(() => this.errorHandle());
+  }
+
+  httpHandle(action: string): Partial<Observer<HttpResponse<VehicleData>>> {
+    return {
+      complete: () => {
+        const modalRef = this.modalService.open(ModalComponent, {
+          centered: true,
+        });
+        modalRef.componentInstance.modalOptions = { action };
+        this.refreshVehiclesData();
+      },
+      error: () => this.errorHandle(),
+    };
+  }
+
+  errorHandle(): void {
+    this.isWaitingResponse = false;
+    const modalRef = this.modalService.open(ModalComponent, {
+      centered: true,
+    });
+    modalRef.componentInstance.modalOptions = { action: 'error' };
   }
 }
