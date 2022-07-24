@@ -13,6 +13,8 @@ import {
   map,
   merge,
   Observable,
+  repeat,
+  Subject,
   Subscription,
   switchMap,
   tap,
@@ -40,6 +42,7 @@ const INPUT_DEBOUNCE_MS = 200;
   ],
 })
 export class DataTableComponent implements OnInit, OnDestroy {
+  private _httpGetNotifier$ = new Subject<void>();
   private _allVehiclesData: VehiclesData = [];
   private _allVehiclesDataSub = new Subscription();
   private _filteredVehicleData: VehicleData = {};
@@ -62,8 +65,9 @@ export class DataTableComponent implements OnInit, OnDestroy {
   @ViewChild('vinInput')
   vinInputElement: ElementRef | undefined;
 
-  allVehiclesData$: Observable<VehiclesData> =
-    this.vehiclesDataService.getVehiclesData();
+  allVehiclesData$: Observable<VehiclesData> = this.vehiclesDataService
+    .getVehiclesData()
+    .pipe(repeat({ delay: () => this._httpGetNotifier$ }));
 
   filteredVehiclesData$: Observable<VehiclesData> =
     this.searchedVin.valueChanges.pipe(
@@ -152,6 +156,15 @@ export class DataTableComponent implements OnInit, OnDestroy {
     private vehiclesDataService: VehiclesDataService,
     private modalService: NgbModal
   ) {}
+
+  private refreshVehiclesData() {
+    this._httpGetNotifier$.next();
+    // Triggers observable where all logic for flags is implemented
+    this.searchedVin.updateValueAndValidity({
+      onlySelf: true,
+      emitEvent: true,
+    });
+  }
 
   ngOnInit(): void {
     this._allVehiclesDataSub = this.allVehiclesData$.subscribe(
