@@ -15,12 +15,22 @@ export class ModalComponent {
 
   constructor(public activeModel: NgbActiveModal) {}
 
-  displayLine(line: string | ModalBodyObject | undefined): string {
-    if (typeof line === 'string') return line;
-    return `${line?.key}: ${line?.value}`;
-  }
   isBold(line: string | ModalBodyObject | undefined): boolean {
     if (typeof line === 'string') return false;
     return !!line?.options?.bold;
+  }
+
+  isString(line: string | ModalBodyObject | undefined): boolean {
+    return typeof line === 'string';
+  }
+
+  getKey(line: string | ModalBodyObject | undefined): string {
+    if (typeof line === 'string') return line;
+    return `${line?.key}: ` ?? '';
+  }
+
+  getValue(line: string | ModalBodyObject | undefined): string {
+    if (typeof line === 'string') return line;
+    return line?.value ?? '';
   }
 }

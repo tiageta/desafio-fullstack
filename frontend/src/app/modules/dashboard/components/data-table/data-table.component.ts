@@ -199,23 +199,6 @@ export class DataTableComponent implements OnInit, OnDestroy {
     this.refreshUpdateOptions();
   }
 
-  openModal(method: 'create' | 'update' | 'delete'): void {
-    const modalRef = this.modalService.open(ModalComponent, { centered: true });
-
-    const modalOptions =
-      method === 'create'
-        ? this.createOptions
-        : method === 'update'
-        ? this.updateOptions
-        : method === 'delete'
-        ? this.deleteOptions
-        : undefined;
-
-    if (!modalOptions) return;
-
-    modalRef.componentInstance.modalOptions = modalOptions;
-  }
-
   refreshCreateOptions(): void {
     this.createOptions = {
       ...this.modalOptions,
@@ -319,5 +302,21 @@ export class DataTableComponent implements OnInit, OnDestroy {
     const tableField = this.tableFields.find((field) => field.type === type);
     if (!tableField) return false;
     return !!tableField.dirty;
+  }
+
+  openModal(method: 'create' | 'update' | 'delete'): void {
+    const modalOptions =
+      method === 'create'
+        ? this.createOptions
+        : method === 'update'
+        ? this.updateOptions
+        : method === 'delete'
+        ? this.deleteOptions
+        : undefined;
+
+    if (!modalOptions) return;
+
+    const modalRef = this.modalService.open(ModalComponent, { centered: true });
+    modalRef.componentInstance.modalOptions = modalOptions;
   }
 }
