@@ -24,7 +24,7 @@ import {
 } from 'src/app/shared/models/modal-options.model';
 import { VehicleData, VehiclesData } from 'src/app/shared/models/vehicle.model';
 import { TableField, TableFields } from '../../interfaces/table-field';
-import { VehiclesService } from '../../services/vehicles.service';
+import { VehiclesDataService } from '../../services/vehicles-data.service';
 
 const VIN_LENGTH = 20;
 const INPUT_DEBOUNCE_MS = 200;
@@ -66,7 +66,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
   vinInputElement: ElementRef | undefined;
 
   allVehiclesData$: Observable<VehiclesData> =
-    this.vehiclesService.getVehiclesData();
+    this.vehiclesDataService.getVehiclesData();
 
   filteredVehiclesData$: Observable<VehiclesData> =
     this.searchedVin.valueChanges.pipe(
@@ -106,7 +106,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
           this._hasVinMatched || (!this._hasVinMatched && this._isVinValid);
       }),
       switchMap((inputtedValue) =>
-        this.vehiclesService.getVehiclesData(inputtedValue)
+        this.vehiclesDataService.getVehiclesData(inputtedValue)
       ),
       tap(() => {
         // Enables delete button
@@ -157,7 +157,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
   deleteOptions: ModalOptions | undefined;
 
   constructor(
-    private vehiclesService: VehiclesService,
+    private vehiclesDataService: VehiclesDataService,
     private modalService: NgbModal
   ) {}
 
