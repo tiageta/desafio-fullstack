@@ -22,7 +22,7 @@ import {
   switchMap,
   tap,
 } from 'rxjs';
-import { ModalComponent } from '../modal/modal.component';
+import { DataModalComponent } from '../data-modal/data-modal.component';
 import { ModalOptions } from '../../interfaces/modal-options.model';
 import { VehicleData, VehiclesData } from 'src/app/shared/models/vehicle.model';
 import { TableField, TableFields } from '../../interfaces/table-field';
@@ -284,7 +284,9 @@ export class DataTableComponent implements OnInit, OnDestroy {
 
     if (!modalOptions) return;
 
-    const modalRef = this.modalService.open(ModalComponent, { centered: true });
+    const modalRef = this.modalService.open(DataModalComponent, {
+      centered: true,
+    });
     modalRef.componentInstance.modalOptions = modalOptions;
     modalRef.result.then(
       () => {
@@ -335,7 +337,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
   httpHandle(action: string): Partial<Observer<HttpResponse<VehicleData>>> {
     return {
       complete: () => {
-        const modalRef = this.modalService.open(ModalComponent, {
+        const modalRef = this.modalService.open(DataModalComponent, {
           centered: true,
         });
         modalRef.componentInstance.modalOptions = { action };
@@ -347,7 +349,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
 
   errorHandle(): void {
     this.isWaitingResponse = false;
-    const modalRef = this.modalService.open(ModalComponent, {
+    const modalRef = this.modalService.open(DataModalComponent, {
       centered: true,
     });
     modalRef.componentInstance.modalOptions = { action: 'error' };
