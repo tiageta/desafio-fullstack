@@ -4,10 +4,13 @@ import {
   ElementRef,
   Input,
   OnChanges,
+  OnDestroy,
+  OnInit,
   QueryList,
   SimpleChanges,
   ViewChildren,
 } from '@angular/core';
+import { fromEvent, Observable, Subscription, throttleTime } from 'rxjs';
 import { Vehicle } from 'src/app/shared/models/vehicle.model';
 import { DataCharts } from '../../interfaces/data-chart';
 
@@ -18,8 +21,15 @@ type HTMLElementRef = ElementRef<HTMLElement>;
   templateUrl: './data-charts.component.html',
   styleUrls: ['./data-charts.component.scss'],
 })
-export class DataChartsComponent implements AfterViewInit, OnChanges {
+export class DataChartsComponent
+  implements OnInit, AfterViewInit, OnChanges, OnDestroy
+{
   private _chartRefsArray: HTMLElementRef[] | undefined;
+  private _resizeObservable$: Observable<Event> = fromEvent(
+    window,
+    'resize'
+  ).pipe(throttleTime(100));
+  private _resizeSub$ = new Subscription();
 
   @ViewChildren('chartElements') chartElementsRef:
     | QueryList<HTMLElementRef>
@@ -47,7 +57,15 @@ export class DataChartsComponent implements AfterViewInit, OnChanges {
     },
   ];
 
-  ngAfterViewInit() {
+  ngOnInit(): void {
+    this._resizeSub$ = this._resizeObservable$.subscribe(() => {
+      if (this.haveChartsLoaded) {
+        this.drawCharts();
+      }
+    });
+  }
+
+  ngAfterViewInit(): void {
     // Get chart template refs
     this._chartRefsArray = this.chartElementsRef?.toArray();
     // Load the Visualization API and the corechart package.
@@ -62,19 +80,17 @@ export class DataChartsComponent implements AfterViewInit, OnChanges {
     if (this.haveChartsLoaded && changes['selectedVehicle']) this.drawCharts();
   }
 
+  ngOnDestroy(): void {
+    this._resizeSub$.unsubscribe();
+  }
+
   // Callback that instantiates the pie chart,
   // passes in the data and draws it.
   drawCharts(): void {
     // Set chart options
     const options: google.visualization.PieChartOptions = {
       pieHole: 0.4,
-      width: 224,
       pieSliceText: 'none',
-      titleTextStyle: {
-        fontName: 'sans-serif',
-        bold: false,
-        fontSize: 20,
-      },
       tooltip: {
         trigger: 'none',
       },
