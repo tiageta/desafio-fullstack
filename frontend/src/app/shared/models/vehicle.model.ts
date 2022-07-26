@@ -1,9 +1,9 @@
 export interface Vehicle {
-  id: number;
-  model: string;
-  totalSales: number;
-  connected: number;
-  softwareUpdated: number;
+  id?: number;
+  model?: string;
+  totalSales?: number;
+  connected?: number;
+  softwareUpdated?: number;
 }
 
 export type Vehicles = Vehicle[];

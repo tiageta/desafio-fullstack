@@ -171,7 +171,10 @@ export class DataTableComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this._allVehiclesDataSub = this.allVehiclesData$.subscribe(
-      (allVehiclesData) => (this._allVehiclesData = allVehiclesData)
+      (allVehiclesData) => {
+        this._allVehiclesData = allVehiclesData;
+        this.searchedVin.setValue(allVehiclesData[0]?.vin ?? '');
+      }
     );
 
     // Populates table fields with filtered data

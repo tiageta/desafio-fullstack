@@ -1,4 +1,4 @@
-import { Component, Output, EventEmitter } from '@angular/core';
+import { Component, Output, EventEmitter, OnInit } from '@angular/core';
 import { Vehicle, Vehicles } from 'src/app/shared/models/vehicle.model';
 import { DataCards } from '../../interfaces/data-card';
 import { VehiclesService } from '../../services/vehicles.service';
@@ -8,9 +8,9 @@ import { VehiclesService } from '../../services/vehicles.service';
   templateUrl: './data-cards.component.html',
   styleUrls: ['./data-cards.component.scss'],
 })
-export class DataCardsComponent {
+export class DataCardsComponent implements OnInit {
   @Output() selectVehicleEvent = new EventEmitter<Vehicle>();
-  selectedVehicle = '-';
+  selectedVehicle = '';
 
   vehicles$ = this.vehiclesService.getVehicles();
 
@@ -21,6 +21,13 @@ export class DataCardsComponent {
   ];
 
   constructor(private vehiclesService: VehiclesService) {}
+
+  ngOnInit(): void {
+    this.vehicles$.subscribe((vehicles) => {
+      this.selectedVehicle = vehicles[0]?.model ?? '';
+      this.emitSelectedVehicle(vehicles);
+    });
+  }
 
   private findSelectedVehicle(vehicles: Vehicles): Vehicle | undefined {
     return vehicles.find((vehicle) => vehicle.model === this.selectedVehicle);
