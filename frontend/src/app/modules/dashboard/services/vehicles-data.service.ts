@@ -1,6 +1,6 @@
 import { HttpClient, HttpResponse } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { firstValueFrom, map, Observable, take, tap } from 'rxjs';
+import { firstValueFrom, map, Observable } from 'rxjs';
 import { VehicleData, VehiclesData } from 'src/app/shared/models/vehicle.model';
 import { environment } from 'src/environments/environment';
 
@@ -8,6 +8,10 @@ const API = environment.API_URL;
 
 interface VehiclesDataResponse {
   data: VehiclesData;
+}
+
+interface VehicleDataResponse {
+  data: VehicleData;
 }
 
 @Injectable({
@@ -26,6 +30,12 @@ export class VehiclesDataService {
           );
         return vehiclesData;
       })
+    );
+  }
+
+  getFirstVehicleData() {
+    return this.http.get<VehicleDataResponse>(`${API}/vehiclesData/1`).pipe(
+      map((response: VehicleDataResponse) => response.data) // pluck is deprecated
     );
   }
 

@@ -7,6 +7,18 @@ table {
 
   .input-field {
     max-width: 85% !important;
+    .loading-wrapper {
+      background-color: transparent;
+      border: none;
+      padding: 0 0.75rem 0 0;
+      width: 0.75rem;
+      box-sizing: content-box;
+      opacity: 0.75;
+      .loading {
+        width: 0.75rem;
+        height: 0.75rem;
+      }
+    }
     input {
       &:disabled {
         background-color: #ddd;
