@@ -2,7 +2,10 @@
   <div class="charts row gap-2 gap-md-0 justify-content-center">
     <div *ngFor="let chart of charts" class="chart-wrapper col-12 col-lg-6">
       <div class="body">
-        <div class="loading-wrapper" *ngIf="!selectedVehicle">
+        <div
+          class="loading-wrapper"
+          *ngIf="!selectedVehicle || !haveChartsLoaded"
+        >
           <span class="spinner-border loading" role="status"></span>
         </div>
         <div
