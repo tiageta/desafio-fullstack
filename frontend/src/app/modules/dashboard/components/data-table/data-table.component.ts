@@ -100,7 +100,7 @@ export class DataTableComponent implements OnInit {
       debounceTime(INPUT_DEBOUNCE_MS),
       filter(
         (inputtedValue) =>
-          this.isVinMinLength || inputtedValue.length < this._inputtedVin.length // _inputtedVin holds previous value; do not filter when erasing
+          inputtedValue.length < this._inputtedVin.length || this.isVinMinLength // _inputtedVin holds previous value; do not filter when erasing
       ),
       map((inputtedValue: string) => {
         // Converts value to uppercase in forms
@@ -132,8 +132,8 @@ export class DataTableComponent implements OnInit {
       }),
       map((inputtedValue) =>
         this._allVehiclesData.filter((vehicleData) => {
-          if (vehicleData.vin) return vehicleData.vin.includes(inputtedValue);
-          return [];
+          if (!vehicleData.vin || !inputtedValue) return false;
+          return vehicleData.vin.includes(inputtedValue);
         })
       ),
       tap(() => {
@@ -146,7 +146,8 @@ export class DataTableComponent implements OnInit {
 
         // Resets loading flag
         this.isLoadingTableData = false;
-      })
+      }),
+      shareReplay(1)
     );
 
   tableFields: TableFields = [
