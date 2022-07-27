@@ -10,10 +10,6 @@ interface VehiclesDataResponse {
   data: VehiclesData;
 }
 
-interface VehicleDataResponse {
-  data: VehicleData;
-}
-
 @Injectable({
   providedIn: 'root',
 })
@@ -30,12 +26,6 @@ export class VehiclesDataService {
           );
         return vehiclesData;
       })
-    );
-  }
-
-  getFirstVehicleData() {
-    return this.http.get<VehicleDataResponse>(`${API}/vehiclesData/1`).pipe(
-      map((response: VehicleDataResponse) => response.data) // pluck is deprecated
     );
   }
 

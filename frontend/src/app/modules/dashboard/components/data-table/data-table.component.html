@@ -19,30 +19,21 @@
           <!-- Input field -->
           <ng-container *ngIf="!tableField.type; else dataCol">
             <div class="input-field d-flex gap-3">
-              <div class="input-group flex-nowrap">
-                <span class="input-group-text loading-wrapper">
-                  <span
-                    @delaySpinner
-                    *ngIf="isFetchingData && isVinMinLength && !isVinValid"
-                    class="spinner-border spinner-border-sm loading"
-                    role="status"
-                  ></span>
-                </span>
-                <input
-                  #vinInput
-                  list="dataVehicles"
-                  class="form-control-sm flex-grow-1"
-                  type="text"
-                  [formControl]="searchedVin"
-                />
-                <datalist id="dataVehicles">
-                  <ng-container *ngIf="!isVinValid && isVinMinLength">
-                    <option *ngFor="let vehicleData of vd.vehiclesData">
-                      {{ vehicleData.vin }}
-                    </option>
-                  </ng-container>
-                </datalist>
-              </div>
+              <input
+                #vinInput
+                list="dataVehicles"
+                class="form-control-sm flex-grow-1"
+                type="text"
+                [formControl]="searchedVin"
+                [maxlength]="maxVinLength"
+              />
+              <datalist id="dataVehicles">
+                <ng-container *ngIf="!isVinValid && isVinMinLength">
+                  <option *ngFor="let vehicleData of vd.vehiclesData">
+                    {{ vehicleData.vin }}
+                  </option>
+                </ng-container>
+              </datalist>
 
               <div class="crud-buttons d-flex gap-1 align-items-center">
                 <button

@@ -10,8 +10,9 @@ import {
   map,
   Observable,
   Observer,
+  repeat,
+  shareReplay,
   Subject,
-  switchMap,
   tap,
 } from 'rxjs';
 import { DataModalComponent } from '../data-modal/data-modal.component';
@@ -38,8 +39,8 @@ const INPUT_DEBOUNCE_MS = 200;
 })
 export class DataTableComponent implements OnInit {
   private _httpGetNotifier$ = new Subject<void>();
+  private _allVehiclesData: VehiclesData = [];
   private _matchedVehicleData: VehicleData = {};
-  private _firstVehicleData: VehicleData = {};
   private _inputtedVin = '';
   private _isVinValid = false;
   private _hasVinMatched = false;
@@ -48,17 +49,17 @@ export class DataTableComponent implements OnInit {
     return this._isVinValid;
   }
 
-  isFetchingData = false;
   isLoadingTableData = false;
   isWaitingResponse = false;
   mayCreate = false;
   mayUpdate = false;
   mayDelete = false;
 
-  searchedVin = new FormControl(
-    { value: '', disabled: true },
-    Validators.required
-  );
+  searchedVin = new FormControl({ value: '', disabled: true }, [
+    Validators.required,
+  ]);
+
+  maxVinLength = VIN_LENGTH;
 
   get isVinMinLength() {
     return this.searchedVin.value.length > 2;
@@ -67,15 +68,31 @@ export class DataTableComponent implements OnInit {
   @ViewChild('vinInput')
   vinInputElement: ElementRef | undefined;
 
-  firstVehicleData$: Observable<VehicleData> = this.vehiclesDataService
-    .getFirstVehicleData()
+  private _allVehiclesData$: Observable<VehiclesData> = this.vehiclesDataService
+    .getVehiclesData()
     .pipe(
-      tap(() =>
-        this.searchedVin.enable({
-          onlySelf: true,
-          emitEvent: false,
-        })
-      )
+      repeat({ delay: () => this._httpGetNotifier$ }),
+      map((allVehiclesData, index) => {
+        // Only on first subscribe
+        if (index === 0) {
+          // Enables input field
+          this.searchedVin.enable({
+            onlySelf: true,
+            emitEvent: false,
+          });
+          // Gets first data to populate page on reload
+          if (allVehiclesData.length) {
+            this.searchedVin.setValue(allVehiclesData[0].vin ?? '');
+            // Triggers flags logic
+            this.searchedVin.updateValueAndValidity({
+              onlySelf: true,
+              emitEvent: true,
+            });
+          }
+        }
+        return allVehiclesData;
+      }),
+      shareReplay(1)
     );
 
   filteredVehiclesData$: Observable<VehiclesData> =
@@ -97,36 +114,29 @@ export class DataTableComponent implements OnInit {
         // Store variables locally as to not depend on input value later in pipe
         this._inputtedVin = inputtedValue;
         this._isVinValid = inputtedValue.length === VIN_LENGTH;
+        this._hasVinMatched =
+          this._isVinValid && this.vinMatchVehicleData(inputtedValue);
 
         // Disables all buttons
         this.mayCreate = this.mayUpdate = this.mayDelete = false;
 
-        // Clears table if vin not valid
-        if (!this._isVinValid) {
-          this._hasVinMatched = false;
-          this.tableFields.forEach((field) => {
-            if (!field.dirty) field.value = ''; // keeps altered values
-          });
-        }
-
-        // Sets flags that triggers spinner in template
-        this.isFetchingData = true;
-        this.isLoadingTableData = this._isVinValid;
-      }),
-      switchMap((inputtedValue) =>
-        this.vehiclesDataService.getVehiclesData(inputtedValue)
-      ),
-      tap((vehiclesData) => {
-        this._hasVinMatched = vehiclesData.length === 1 && this._isVinValid;
-
         // Clears table if no match
         if (!this._hasVinMatched) {
-          this._hasVinMatched = false;
           this.tableFields.forEach((field) => {
             if (!field.dirty) field.value = ''; // keeps altered values
           });
         }
 
+        // Sets flag that triggers spinner in template
+        this.isLoadingTableData = this._hasVinMatched;
+      }),
+      map((inputtedValue) =>
+        this._allVehiclesData.filter((vehicleData) => {
+          if (vehicleData.vin) return vehicleData.vin.includes(inputtedValue);
+          return [];
+        })
+      ),
+      tap(() => {
         // Enables delete button
         this.mayDelete = this._hasVinMatched;
 
@@ -134,8 +144,7 @@ export class DataTableComponent implements OnInit {
         this.mayCreate = this._isVinValid && !this._hasVinMatched;
         if (this.mayCreate) this.refreshCreateOptions();
 
-        // Resets loading flags
-        this.isFetchingData = false;
+        // Resets loading flag
         this.isLoadingTableData = false;
       })
     );
@@ -164,14 +173,11 @@ export class DataTableComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    // Get vehicle data of id=1 to populate dashboard on reload
-    this.firstVehicleData$.subscribe((firstVehicleData) => {
-      this._firstVehicleData = firstVehicleData;
-      this.searchedVin.setValue(firstVehicleData.vin ?? '');
-      this.searchedVin.updateValueAndValidity({
-        onlySelf: true,
-        emitEvent: true,
-      });
+    // Initially gets all vehicles data for better search performance.
+    // This strategy would not be scalable and was only chosen to select
+    // data more easily, focusing on testing other core features of this app
+    this._allVehiclesData$.subscribe((allVehiclesData) => {
+      this._allVehiclesData = allVehiclesData;
     });
 
     // Populates table fields with filtered data
@@ -187,7 +193,8 @@ export class DataTableComponent implements OnInit {
     });
   }
 
-  private refreshVehiclesData() {
+  private refreshVehiclesData(): void {
+    this._httpGetNotifier$.next();
     // Triggers observable where all logic for flags is implemented
     this.searchedVin.updateValueAndValidity({
       onlySelf: true,
@@ -195,10 +202,18 @@ export class DataTableComponent implements OnInit {
     });
   }
 
+  private vinMatchVehicleData(vin: string): boolean {
+    return !!this._allVehiclesData.find(
+      // redundancy check to uppercase, already handled in pipe
+      (vehicleData) => vehicleData.vin?.toUpperCase() === vin.toUpperCase()
+    );
+  }
+
   handleDirtyField(tableField: TableField): void {
-    const originalValue = tableField.type
-      ? this._matchedVehicleData[tableField.type]
-      : undefined;
+    const originalValue =
+      tableField.type && this._hasVinMatched
+        ? this._matchedVehicleData[tableField.type]
+        : undefined;
     tableField.dirty = this.getFieldValue(tableField.type) !== originalValue;
 
     this.mayUpdate = this._hasVinMatched && this.isAnyFieldDirty(); // Enables update button
