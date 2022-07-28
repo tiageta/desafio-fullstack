@@ -2,4 +2,20 @@
   min-height: 90vh;
   position: relative;
   padding-bottom: 108px; // table height
+
+  #grid-wrapper {
+    grid-template-columns: repeat(2, 1fr);
+    justify-content: space-between;
+    align-items: center;
+    #image,
+    #charts {
+      width: 100%;
+      height: 100%;
+    }
+  }
+}
+
+#table {
+  position: relative;
+  z-index: 1031;
 }

@@ -1,6 +1,6 @@
-<div *ngIf="user$ | async as user">
-  <div *ngIf="isUserLoggedIn()">
-    <header class="sticky-top">
+<ng-container *ngIf="user$ | async as user">
+  <ng-container *ngIf="isUserLoggedIn()">
+    <header class="fixed-top">
       <nav class="navbar navbar-light bg-white">
         <div class="container-fluid">
           <app-menu></app-menu>
@@ -28,7 +28,7 @@
                   class="fa fa-user-circle fa-2x rounded-circle position-relative img-fluid"
                 ></i>
                 <div class="fs-5">
-                  {{ user.name }}
+                  {{ user.username }}
                 </div>
               </div>
               <hr />
@@ -43,5 +43,5 @@
         </div>
       </nav>
     </header>
-  </div>
-</div>
+  </ng-container>
+</ng-container>

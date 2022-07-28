@@ -1,0 +1,10 @@
+.wrapper {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  align-items: center;
+  .car-picture {
+    position: absolute;
+    width: 100%;
+  }
+}

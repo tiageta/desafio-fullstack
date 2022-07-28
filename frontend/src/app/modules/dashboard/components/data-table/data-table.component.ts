@@ -1,25 +1,25 @@
 import { animate, style, transition, trigger } from '@angular/animations';
-import {
-  Component,
-  ElementRef,
-  OnDestroy,
-  OnInit,
-  ViewChild,
-} from '@angular/core';
+import { HttpResponse } from '@angular/common/http';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import {
   debounceTime,
-  distinctUntilChanged,
+  filter,
+  finalize,
   map,
-  merge,
   Observable,
-  Subscription,
-  switchMap,
+  Observer,
+  repeat,
+  shareReplay,
+  Subject,
   tap,
 } from 'rxjs';
-import { VehiclesData } from 'src/app/shared/models/vehicle.model';
+import { DataModalComponent } from '../data-modal/data-modal.component';
+import { ModalOptions } from '../../interfaces/modal-options.model';
+import { VehicleData, VehiclesData } from 'src/app/shared/models/vehicle.model';
 import { TableField, TableFields } from '../../interfaces/table-field';
-import { VehiclesService } from '../../services/vehicles.service';
+import { VehiclesDataService } from '../../services/vehicles-data.service';
 
 const VIN_LENGTH = 20;
 const INPUT_DEBOUNCE_MS = 200;
@@ -37,28 +37,71 @@ const INPUT_DEBOUNCE_MS = 200;
     ]),
   ],
 })
-export class DataTableComponent implements OnInit, OnDestroy {
-  private _allVehiclesData: VehiclesData | undefined;
-  private _allVehiclesDataSub = new Subscription();
+export class DataTableComponent implements OnInit {
+  private _httpGetNotifier$ = new Subject<void>();
+  private _allVehiclesData: VehiclesData = [];
+  private _matchedVehicleData: VehicleData = {};
+  private _inputtedVin = '';
+  private _isVinValid = false;
   private _hasVinMatched = false;
-  private _isTableDataOnScreen = false;
+
+  get isVinValid() {
+    return this._isVinValid;
+  }
 
   isLoadingTableData = false;
+  isWaitingResponse = false;
+  mayCreate = false;
+  mayUpdate = false;
+  mayDelete = false;
 
-  searchedVin = new FormControl(
-    { value: '', disabled: true },
-    Validators.required
-  );
+  searchedVin = new FormControl({ value: '', disabled: true }, [
+    Validators.required,
+  ]);
+
+  maxVinLength = VIN_LENGTH;
+
+  get isVinMinLength() {
+    return this.searchedVin.value.length > 2;
+  }
 
   @ViewChild('vinInput')
   vinInputElement: ElementRef | undefined;
 
-  allVehiclesData$: Observable<VehiclesData> =
-    this.vehiclesService.getVehiclesData();
+  private _allVehiclesData$: Observable<VehiclesData> = this.vehiclesDataService
+    .getVehiclesData()
+    .pipe(
+      repeat({ delay: () => this._httpGetNotifier$ }),
+      map((allVehiclesData, index) => {
+        // Only on first subscribe
+        if (index === 0) {
+          // Enables input field
+          this.searchedVin.enable({
+            onlySelf: true,
+            emitEvent: false,
+          });
+          // Gets first data to populate page on reload
+          if (allVehiclesData.length) {
+            this.searchedVin.setValue(allVehiclesData[0].vin ?? '');
+            // Triggers flags logic
+            this.searchedVin.updateValueAndValidity({
+              onlySelf: true,
+              emitEvent: true,
+            });
+          }
+        }
+        return allVehiclesData;
+      }),
+      shareReplay(1)
+    );
 
   filteredVehiclesData$: Observable<VehiclesData> =
     this.searchedVin.valueChanges.pipe(
       debounceTime(INPUT_DEBOUNCE_MS),
+      filter(
+        (inputtedValue) =>
+          inputtedValue.length < this._inputtedVin.length || this.isVinMinLength // _inputtedVin holds previous value; do not filter when erasing
+      ),
       map((inputtedValue: string) => {
         // Converts value to uppercase in forms
         const upperCaseInputtedValue = inputtedValue.toUpperCase();
@@ -68,75 +111,257 @@ export class DataTableComponent implements OnInit, OnDestroy {
         return upperCaseInputtedValue;
       }),
       tap((inputtedValue) => {
-        // Store flag locally as to not depend o input value later in pipe
+        // Store variables locally as to not depend on input value later in pipe
+        this._inputtedVin = inputtedValue;
+        this._isVinValid = inputtedValue.length === VIN_LENGTH;
         this._hasVinMatched =
-          inputtedValue.length === VIN_LENGTH &&
-          this.vinMatchVehicleData(inputtedValue);
+          this._isVinValid && this.vinMatchVehicleData(inputtedValue);
 
-        // Unfocus input field as to not popup datalist on data load
-        if (this._hasVinMatched && this.vinInputElement) {
-          this.vinInputElement.nativeElement.blur();
+        // Disables all buttons
+        this.mayCreate = this.mayUpdate = this.mayDelete = false;
+
+        // Clears table if no match
+        if (!this._hasVinMatched) {
+          this.tableFields.forEach((field) => {
+            if (!field.dirty) field.value = ''; // keeps altered values
+          });
         }
 
         // Sets flag that triggers spinner in template
-        this.isLoadingTableData =
-          (this._hasVinMatched && !this._isTableDataOnScreen) ||
-          (!this._hasVinMatched && this._isTableDataOnScreen);
+        this.isLoadingTableData = this._hasVinMatched;
       }),
-      distinctUntilChanged(),
-      switchMap((inputtedValue) =>
-        this.vehiclesService.getVehiclesData(inputtedValue)
+      map((inputtedValue) =>
+        this._allVehiclesData.filter((vehicleData) => {
+          if (!vehicleData.vin || !inputtedValue) return false;
+          return vehicleData.vin.includes(inputtedValue);
+        })
       ),
       tap(() => {
-        // Controls final state of loading flags
-        if (this.isLoadingTableData)
-          this._isTableDataOnScreen = this._hasVinMatched;
-        this.isLoadingTableData = false;
-      })
-    );
+        // Enables delete button
+        this.mayDelete = this._hasVinMatched;
 
-  vehiclesData$: Observable<VehiclesData> = merge(
-    this.allVehiclesData$,
-    this.filteredVehiclesData$
-  ).pipe(
-    tap(() =>
-      this.searchedVin.enable({
-        onlySelf: true,
-        emitEvent: false,
-      })
-    )
-  );
+        // Enables create button
+        this.mayCreate = this._isVinValid && !this._hasVinMatched;
+        if (this.mayCreate) this.refreshCreateOptions();
+
+        // Resets loading flag
+        this.isLoadingTableData = false;
+      }),
+      shareReplay(1)
+    );
 
   tableFields: TableFields = [
     { header: 'Código - Vin' },
-    { header: 'Odômetro', data: 'odometer', unit: ' km' },
-    { header: 'Nível de Combustível', data: 'fuelLevel', unit: ' %' },
-    { header: 'Status', data: 'status' },
-    { header: 'Lat.', data: 'lat' },
-    { header: 'Long.', data: 'long' },
+    { header: 'Odômetro', type: 'odometer', value: '', unit: ' km' },
+    {
+      header: 'Nível de Combustível',
+      type: 'fuelLevel',
+      value: '',
+      unit: ' %',
+    },
+    { header: 'Status', type: 'vehicleStatus', value: '' },
+    { header: 'Lat.', type: 'latitude', value: '' },
+    { header: 'Long.', type: 'longitude', value: '' },
   ];
 
-  constructor(private vehiclesService: VehiclesService) {}
+  createOptions: ModalOptions | undefined;
+  updateOptions: ModalOptions | undefined;
+  deleteOptions: ModalOptions | undefined;
+
+  constructor(
+    private vehiclesDataService: VehiclesDataService,
+    private modalService: NgbModal
+  ) {}
 
   ngOnInit(): void {
-    this._allVehiclesDataSub = this.allVehiclesData$.subscribe(
-      (allVehiclesData) => (this._allVehiclesData = allVehiclesData)
-    );
+    // Initially gets all vehicles data for better search performance.
+    // This strategy would not be scalable and was only chosen to select
+    // data more easily, focusing on testing other core features of this app
+    this._allVehiclesData$.subscribe((allVehiclesData) => {
+      this._allVehiclesData = allVehiclesData;
+    });
+
+    // Populates table fields with filtered data
+    this.filteredVehiclesData$.subscribe((filteredVehiclesData) => {
+      if (filteredVehiclesData.length !== 1 || !this._hasVinMatched) return;
+      this._matchedVehicleData = filteredVehiclesData[0];
+      this.tableFields.forEach((field) => {
+        if (!field.type) return;
+        field.value = this._matchedVehicleData[field.type]?.toString() ?? '';
+        field.dirty = false;
+      });
+      if (this.mayDelete) this.refreshDeleteOptions();
+    });
   }
 
-  ngOnDestroy(): void {
-    this._allVehiclesDataSub.unsubscribe();
+  private refreshVehiclesData(): void {
+    this._httpGetNotifier$.next();
+    // Triggers observable where all logic for flags is implemented
+    this.searchedVin.updateValueAndValidity({
+      onlySelf: true,
+      emitEvent: true,
+    });
   }
 
-  getDataFromVehicle(data: TableField['data'], vehiclesData: VehiclesData) {
-    if (!data || vehiclesData.length !== 1) return '-'; // still no match
-    return vehiclesData[0][data].toString();
-  }
-
-  vinMatchVehicleData(vin: string): boolean {
-    return !!this._allVehiclesData?.find(
+  private vinMatchVehicleData(vin: string): boolean {
+    return !!this._allVehiclesData.find(
       // redundancy check to uppercase, already handled in pipe
-      (vehicleData) => vehicleData.vin.toUpperCase() === vin.toUpperCase()
+      (vehicleData) => vehicleData.vin?.toUpperCase() === vin.toUpperCase()
     );
+  }
+
+  handleDirtyField(tableField: TableField): void {
+    const originalValue =
+      tableField.type && this._hasVinMatched
+        ? this._matchedVehicleData[tableField.type]
+        : undefined;
+    tableField.dirty = this.getFieldValue(tableField.type) !== originalValue;
+
+    this.mayUpdate = this._hasVinMatched && this.isAnyFieldDirty(); // Enables update button
+    this.refreshCreateOptions();
+    this.refreshUpdateOptions();
+  }
+
+  isAnyFieldDirty(): boolean {
+    return this.tableFields.some((field) => field.dirty);
+  }
+
+  refreshCreateOptions(): void {
+    this.createOptions = {
+      action: 'create',
+      body: {
+        vin: this._inputtedVin,
+        odometer: this.getFieldValue('odometer'),
+        fuelLevel: this.getFieldValue('fuelLevel'),
+        vehicleStatus: this.getFieldValue('vehicleStatus'),
+        latitude: this.getFieldValue('latitude'),
+        longitude: this.getFieldValue('longitude'),
+      },
+    };
+  }
+
+  refreshUpdateOptions(): void {
+    this.updateOptions = {
+      action: 'update',
+      body: {
+        vin: this._matchedVehicleData.vin ?? '',
+        odometer: this.getFieldValue('odometer'),
+        fuelLevel: this.getFieldValue('fuelLevel'),
+        vehicleStatus: this.getFieldValue('vehicleStatus'),
+        latitude: this.getFieldValue('latitude'),
+        longitude: this.getFieldValue('longitude'),
+      },
+      bold: {
+        odometer: this.isFieldDirty('odometer'),
+        fuelLevel: this.isFieldDirty('fuelLevel'),
+        vehicleStatus: this.isFieldDirty('vehicleStatus'),
+        latitude: this.isFieldDirty('latitude'),
+        longitude: this.isFieldDirty('longitude'),
+      },
+    };
+  }
+
+  refreshDeleteOptions(): void {
+    this.deleteOptions = {
+      action: 'delete',
+      body: {
+        vin: this._matchedVehicleData.vin ?? '',
+        odometer: this._matchedVehicleData.odometer ?? '',
+        fuelLevel: this._matchedVehicleData.fuelLevel ?? '',
+        vehicleStatus: this._matchedVehicleData.vehicleStatus ?? '',
+        latitude: this._matchedVehicleData.latitude ?? '',
+        longitude: this._matchedVehicleData.longitude ?? '',
+      },
+    };
+  }
+
+  getFieldValue(type: TableField['type']): string {
+    return this.tableFields.find((field) => field.type === type)?.value ?? '';
+  }
+
+  isFieldDirty(type: TableField['type']): boolean {
+    const tableField = this.tableFields.find((field) => field.type === type);
+    if (!tableField) return false;
+    return !!tableField.dirty;
+  }
+
+  openModal(method: 'create' | 'update' | 'delete'): void {
+    const modalOptions = [
+      this.createOptions,
+      this.updateOptions,
+      this.deleteOptions,
+    ].find((options) => options?.action === method);
+
+    if (!modalOptions) return;
+
+    const modalRef = this.modalService.open(DataModalComponent, {
+      centered: true,
+    });
+    modalRef.componentInstance.modalOptions = modalOptions;
+    modalRef.result.then(
+      () => {
+        this.isWaitingResponse = true;
+        if (Object.is(modalOptions, this.createOptions)) this.createHandle();
+        else if (Object.is(modalOptions, this.updateOptions))
+          this.updateHandle();
+        else this.deleteHandle(); // already returned if neither above
+      },
+      () => {} // lib throws an error if onreject is omitted; handles modal dismiss
+    );
+  }
+
+  createHandle(): void {
+    const newVehicleData = this.createOptions?.body ?? {};
+    this.vehiclesDataService
+      .createVehicleData(newVehicleData)
+      .pipe(finalize(() => (this.isWaitingResponse = false)))
+      .subscribe(this.httpHandle('created'));
+  }
+
+  updateHandle() {
+    const updatedVehicleData = this.updateOptions?.body ?? {};
+    if (!updatedVehicleData.vin) return;
+    this.vehiclesDataService
+      .updateVehicleData(updatedVehicleData.vin, updatedVehicleData)
+      .then((observable) =>
+        observable
+          .pipe(finalize(() => (this.isWaitingResponse = false)))
+          .subscribe(this.httpHandle('updated'))
+      )
+      .catch(() => this.errorHandle());
+  }
+
+  deleteHandle() {
+    const deletedVehicleData = this.deleteOptions?.body ?? {};
+    if (!deletedVehicleData.vin) return;
+    this.vehiclesDataService
+      .deleteVehicleData(deletedVehicleData.vin)
+      .then((observable) =>
+        observable
+          .pipe(finalize(() => (this.isWaitingResponse = false)))
+          .subscribe(this.httpHandle('deleted'))
+      )
+      .catch(() => this.errorHandle());
+  }
+
+  httpHandle(action: string): Partial<Observer<HttpResponse<VehicleData>>> {
+    return {
+      complete: () => {
+        const modalRef = this.modalService.open(DataModalComponent, {
+          centered: true,
+        });
+        modalRef.componentInstance.modalOptions = { action };
+        this.refreshVehiclesData();
+      },
+      error: () => this.errorHandle(),
+    };
+  }
+
+  errorHandle(): void {
+    this.isWaitingResponse = false;
+    const modalRef = this.modalService.open(DataModalComponent, {
+      centered: true,
+    });
+    modalRef.componentInstance.modalOptions = { action: 'error' };
   }
 }

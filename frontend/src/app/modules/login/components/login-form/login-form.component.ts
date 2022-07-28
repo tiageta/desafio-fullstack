@@ -26,7 +26,7 @@ export class LoginFormComponent implements OnInit, OnDestroy {
   private _autoLogin = false;
   private _authSub = new Subscription();
 
-  user = '';
+  username = '';
   password = '';
   passwordType: 'password' | 'text' = 'password';
   isPasswordShown = false;
@@ -50,7 +50,7 @@ export class LoginFormComponent implements OnInit, OnDestroy {
   login(): void {
     this.isSigningIn = true;
     this._authSub = this.authService
-      .auth(this.user, this.password)
+      .auth(this.username, this.password)
       .pipe(finalize(() => (this.isSigningIn = false)))
       .subscribe({
         complete: () => this.router.navigate(['home']),

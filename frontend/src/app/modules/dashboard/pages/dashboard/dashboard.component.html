@@ -3,9 +3,21 @@
 
   <app-data-cards (selectVehicleEvent)="selectVehicle($event)"></app-data-cards>
 
-  <app-car-image [selectedVehicle]="selectedVehicle"></app-car-image>
+  <div class="container mt-4 mb-4 mt-xl-5 mb-xl-5">
+    <div id="grid-wrapper" class="d-block d-lg-grid">
+      <app-car-image
+        id="image"
+        [selectedVehicle]="selectedVehicle"
+      ></app-car-image>
+      <app-data-charts
+        id="charts"
+        [selectedVehicle]="selectedVehicle"
+      ></app-data-charts>
+    </div>
+  </div>
 
   <app-data-table
+    id="table"
     class="position-fixed bottom-0 start-0 end-0 bg-white"
   ></app-data-table>
 </div>

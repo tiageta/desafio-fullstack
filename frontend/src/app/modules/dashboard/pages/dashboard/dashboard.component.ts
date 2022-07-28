@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Vehicle } from 'src/app/shared/models/vehicle.model';
 
 @Component({
   selector: 'app-dashboard',
@@ -6,9 +7,9 @@ import { Component } from '@angular/core';
   styleUrls: ['./dashboard.component.scss'],
 })
 export class DashboardComponent {
-  selectedVehicle = '';
+  selectedVehicle: Vehicle | undefined;
 
-  selectVehicle(vehicle: string) {
+  selectVehicle(vehicle: Vehicle) {
     this.selectedVehicle = vehicle;
   }
 }

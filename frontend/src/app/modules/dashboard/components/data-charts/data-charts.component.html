@@ -1,0 +1,21 @@
+<div class="container">
+  <div class="charts row gap-2 gap-md-0 justify-content-center">
+    <div *ngFor="let chart of charts" class="chart-wrapper col-12 col-lg-6">
+      <div class="body">
+        <div
+          class="loading-wrapper"
+          *ngIf="!selectedVehicle || !haveChartsLoaded"
+        >
+          <span class="spinner-border loading" role="status"></span>
+        </div>
+        <div
+          [ngStyle]="{ opacity: !selectedVehicle ? '0' : '1' }"
+          #chartElements
+          class="chart"
+        ></div>
+      </div>
+      <div class="value text-primary">{{ chart.percent }}</div>
+      <div class="title text-primary">{{ chart.title }}</div>
+    </div>
+  </div>
+</div>

@@ -6,6 +6,7 @@ import { SharedModule } from '../shared/shared.module';
 import { MenuComponent } from './components/menu/menu.component';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { TokenAuthInterceptor } from './interceptors/token-auth.interceptor';
+import { AuthCredentialsInterceptor } from './interceptors/auth-credentials.interceptor';
 
 @NgModule({
   declarations: [HeaderComponent, MenuComponent],
@@ -15,6 +16,11 @@ import { TokenAuthInterceptor } from './interceptors/token-auth.interceptor';
     {
       provide: HTTP_INTERCEPTORS,
       useClass: TokenAuthInterceptor,
+      multi: true,
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: AuthCredentialsInterceptor,
       multi: true,
     },
   ],

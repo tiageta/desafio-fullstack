@@ -4,31 +4,35 @@ import { Observable, tap } from 'rxjs';
 import { UserService } from '../services/user.service';
 import { environment } from 'src/environments/environment';
 
-const API = environment.apiURL;
+const API = environment.API_URL;
+
+interface ResponseBody {
+  accessToken?: string;
+}
 
 @Injectable({
   providedIn: 'root',
 })
 export class AuthService {
-  constructor(
-    private httpClient: HttpClient,
-    private userService: UserService
-  ) {}
+  constructor(private http: HttpClient, private userService: UserService) {}
 
-  auth(userName: string, password: string): Observable<HttpResponse<any>> {
-    return this.httpClient
+  auth(
+    username: string,
+    password: string
+  ): Observable<HttpResponse<ResponseBody>> {
+    return this.http
       .post(
-        `${API}/user/login`,
+        `${API}/login`,
         {
-          userName,
+          username,
           password,
         },
         { observe: 'response' }
       )
       .pipe(
         tap((res) => {
-          const authToken = res.headers.get('x-access-token') ?? '';
-          this.userService.setUserToken(authToken);
+          const accessToken = res.body?.accessToken ?? '';
+          this.userService.setUserToken(accessToken);
         })
       );
   }

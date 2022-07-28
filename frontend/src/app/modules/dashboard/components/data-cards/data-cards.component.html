@@ -1,8 +1,9 @@
 <!-- async pipe wrapped in object to always return true; used for placeholder logic -->
-<div class="container" *ngIf="{ vehicles: vehicles$ | async } as v">
+<div class="container mb-3" *ngIf="{ vehicles: vehicles$ | async } as v">
   <div
     class="d-flex flex-wrap gap-2 align-items-stretch justify-content-center justify-content-md-between"
   >
+    <!-- Select model card -->
     <div class="card">
       <div class="card-header fs-5">Veículo</div>
       <div class="card-body">
@@ -10,22 +11,19 @@
           class="form-select form-select-lg"
           [disabled]="!v.vehicles"
           [(ngModel)]="selectedVehicle"
-          (change)="selectVehicleEvent.emit(selectedVehicle)"
+          (change)="emitSelectedVehicle(v.vehicles)"
         >
+          <!-- Available options -->
           <ng-container *ngIf="!!v.vehicles">
-            <option disabled selected value="-">-</option>
-            <option
-              *ngFor="let vehicle of v.vehicles"
-              [value]="vehicle.vehicle"
-            >
-              <!-- redudancy due to API naming convention -->
-              {{ vehicle.vehicle }}
+            <option *ngFor="let vehicle of v.vehicles" [value]="vehicle.model">
+              {{ vehicle.model }}
             </option>
           </ng-container>
         </select>
       </div>
     </div>
 
+    <!-- Other data cards -->
     <div *ngFor="let dataCard of dataCards">
       <div class="card">
         <div class="card-header fs-5">{{ dataCard.header }}</div>
@@ -36,6 +34,8 @@
           >
             {{ dataCard.callback(v.vehicles) }}
           </div>
+
+          <!-- Loading placeholder -->
           <ng-template #placeholder>
             <div class="placeholder-glow">
               <span class="placeholder col-2 bg-primary">&nbsp;</span>

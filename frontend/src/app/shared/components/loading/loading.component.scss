@@ -1,0 +1,13 @@
+.background-lock {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  z-index: 1050;
+  background-color: black;
+  opacity: 0.6;
+}

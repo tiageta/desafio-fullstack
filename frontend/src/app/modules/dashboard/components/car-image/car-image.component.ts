@@ -1,75 +1,44 @@
-import {
-  animate,
-  state,
-  style,
-  transition,
-  trigger,
-} from '@angular/animations';
-import { Component, Input, OnChanges, SimpleChanges } from '@angular/core';
+import { animate, style, transition, trigger } from '@angular/animations';
+import { Component, Input } from '@angular/core';
+import { Observable } from 'rxjs';
+import { Vehicle, Vehicles } from 'src/app/shared/models/vehicle.model';
+import { VehiclesService } from '../../services/vehicles.service';
 
 @Component({
   selector: 'app-car-image',
   templateUrl: './car-image.component.html',
   styleUrls: ['./car-image.component.scss'],
   animations: [
-    trigger('imageLeave', [
-      state('true', style({ transform: 'translateX(10%)', opacity: 0 })),
-      state('false', style({ transform: 'translateX(0)', opacity: 1 })),
-      transition('false => true', animate(150)),
-    ]),
-
-    trigger('imageArrive', [
-      state('true', style({ transform: 'translateX(-10%)', opacity: 0 })),
-      state('false', style({ transform: 'translateX(0)', opacity: 1 })),
-      transition('true => false', animate(150)),
+    trigger('imageTransition', [
+      transition(':enter', [
+        style({ transform: 'translateX(-10%)', opacity: 0 }),
+        animate(150, style({ transform: 'translateX(0)', opacity: 1 })),
+      ]),
+      transition(':leave', [
+        style({ transform: 'translateX(0)', opacity: 1 }),
+        animate(150, style({ transform: 'translateX(10%)', opacity: 0 })),
+      ]),
     ]),
   ],
 })
-export class CarImageComponent implements OnChanges {
-  private _previousImgUrl = '';
-  private _previousImgAlt = '';
+export class CarImageComponent {
+  @Input() selectedVehicle: Vehicle | undefined;
 
-  @Input() selectedVehicle = '';
+  vehicles$: Observable<Vehicles> = this.vehiclesService.getVehicles();
 
-  hasSelectionChanged = false;
-  hasImgLeft = false;
+  constructor(private vehiclesService: VehiclesService) {}
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['selectedVehicle']) {
-      this.hasSelectionChanged = true; // triggers leave transition
-    }
-  }
-  triggerLeave(): boolean {
-    return !this.hasImgLeft && this.hasSelectionChanged;
-  }
-  afterLeave() {
-    this.hasImgLeft = true; // triggers arrive transition
+  isVehicleSelected(vehicle: Vehicle): boolean {
+    return vehicle.model === this.selectedVehicle?.model;
   }
 
-  triggerArrive(): boolean {
-    return this.hasImgLeft && this.hasSelectionChanged;
-  }
-  afterArrive() {
-    this.hasImgLeft = false;
-    this.hasSelectionChanged = false;
+  getVehicleImgUrl(vehicle: Vehicle): string {
+    if (!vehicle.model) return '';
+    return `assets/img/${vehicle.model.replace(/\s/g, '')}.png`;
   }
 
-  get vehicleImgUrl(): string {
-    if (this.hasSelectionChanged) return this._previousImgUrl;
-
-    const _vehicleImgUrl =
-      this.selectedVehicle !== ''
-        ? `assets/img/${this.selectedVehicle.replace(/\s/g, '')}.png`
-        : '';
-    this._previousImgUrl = _vehicleImgUrl;
-    return _vehicleImgUrl;
-  }
-
-  get vehicleImgAlt(): string {
-    if (this.hasSelectionChanged) return this._previousImgAlt;
-
-    const _vehicleImgAlt = this.selectedVehicle;
-    this._previousImgAlt = _vehicleImgAlt;
-    return _vehicleImgAlt;
+  getVehicleImgAlt(vehicle: Vehicle): string {
+    if (!vehicle.model) return '';
+    return vehicle.model;
   }
 }

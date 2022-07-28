@@ -5,9 +5,12 @@ import { DashboardRoutingModule } from './dashboard-routing.module';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { SharedModule } from 'src/app/shared/shared.module';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { NgbTooltipModule } from '@ng-bootstrap/ng-bootstrap';
 import { DataTableComponent } from './components/data-table/data-table.component';
 import { DataCardsComponent } from './components/data-cards/data-cards.component';
 import { CarImageComponent } from './components/car-image/car-image.component';
+import { DataChartsComponent } from './components/data-charts/data-charts.component';
+import { DataModalComponent } from './components/data-modal/data-modal.component';
 
 @NgModule({
   declarations: [
@@ -15,6 +18,8 @@ import { CarImageComponent } from './components/car-image/car-image.component';
     DataTableComponent,
     DataCardsComponent,
     CarImageComponent,
+    DataChartsComponent,
+    DataModalComponent,
   ],
   imports: [
     CommonModule,
@@ -22,6 +27,7 @@ import { CarImageComponent } from './components/car-image/car-image.component';
     SharedModule,
     FormsModule,
     ReactiveFormsModule,
+    NgbTooltipModule,
   ],
 })
 export class DashboardModule {}
