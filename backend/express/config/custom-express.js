@@ -37,8 +37,8 @@ module.exports = () => {
 
   app.use("/vehicles", require("../routes/api/vehicles"));
   app.use("/vehiclesData", require("../routes/api/vehicles-data"));
-  app.use(verifyJWT); // users api require auth
   app.use("/users", require("../routes/api/users"));
+  app.use(verifyJWT); // users api require auth
 
   return app;
 };

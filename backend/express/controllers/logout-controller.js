@@ -12,7 +12,7 @@ const handleLogout = async (req, res) => {
   if (!foundUser) {
     res.clearCookie("jwt", {
       httpOnly: true,
-      secure: true,
+      // secure: true,
       sameSite: "None",
     });
     return res.sendStatus(204);
@@ -23,7 +23,7 @@ const handleLogout = async (req, res) => {
 
   res.clearCookie("jwt", {
     httpOnly: true,
-    secure: true,
+    // secure: true,
     sameSite: "None",
   });
   res.sendStatus(204);
