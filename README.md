@@ -1,25 +1,21 @@
 # Desafio Fullstack
 
-Esse projeto foi gerado com o [Angular CLI](https://github.com/angular/angular-cli) versão 13.3.6.
+Esse projeto foi gerado com o [Angular CLI](https://github.com/angular/angular-cli) versão 13.3.6 e [Node](https://nodejs.org) versão 16.16.0. A API também serve as páginas geradas pelo _build_ da aplicação, e usando `npm install` na pasta raiz instala os _node_modules_ em ambas.
+
+Você pode acessar uma [versão de deploy](https://ford-desafio-tiagolima.herokuapp.com/) hospedada no Heroku.
 
 ## Banco de dados MySQL
 
-Um servidor MySQL rodando em `http://localhost:3306/` é requerido antes de inicializar a API. o Esquema `ford_api` deve começar vazio, já que a API inicialmente cria as tabelas necessárias e preenche-as com dados de teste.
-
-O usuário e senha de conexão, no entanto, devem ser configurados em `backend/express/config/db-connection.js`.
+Um servidor MySQL está rodando em nuvem por meio do ClearDB e Heroku. Caso se queira alternar para um desenvolvimento local, as configurações do banco de dados devem ser ajustadas em `backend/express/config/db-connection.js` – o esquema que for especificado será preenchido automaticamente com valores de teste, ao rodar a API.
 
 ## Servidor de desenvolvimento
 
-Rode `npm install` e `npm run dev` em `backend/express/` para começar um servidor de desenvolvimento para a API. Você poderá ver o seu index em `http://localhost:3000/`.
+Rode `npm run dev` para começar um servidor de desenvolvimento local para a API em `http://localhost:3000/` e para a aplicação em `http://localhost:4200/` – ambos vão recarregar automaticamente se você alterar qualquer um dos arquivos.
 
-Rode `npm install` e `ng serve` em `frontend/` para ter um servidor de desenvolvimento da aplicação Angular. Navegue para `http://localhost:4200/`, onde você poderá logar como `admin` com a senha `123` – um dos dados de teste que já foram gerados.
+Também é possível usar os comandos `npm run server` e `npm run client` para rodar somente a API ou somente a aplicação, respectivamente.
 
-Ambas a aplicação e a API vão recarregar automaticamente se você alterar qualquer um dos arquivos.
+Você poderá logar como `admin` com a senha `123` na aplicação, um dos dados de teste que já foram gerados.
 
 ## Build
 
-Rode `ng build` em `frontend/` para gerar o _build_ do projeto Angular. O resultado dessa operação será armazenado no diretório `frontend/dist/`.
-
-## Ajuda adicional
-
-Para obter mais ajuda sobre o Angular CLI, use `ng help` em `frontend/` ou confira a página [Angular CLI Overview and Command Reference](https://angular.io/cli).
+Rode `npm run build` para gerar o _build_ da aplicação Angular. Os artefatos dessa operação serão armazenados no diretório `client/dist/`.

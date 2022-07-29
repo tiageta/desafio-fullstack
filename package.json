@@ -1,12 +1,17 @@
 {
-  "name": "api_ford",
+  "name": "desafio-fullstack",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "private": true,
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "client": "cd client && ng serve",
+    "server": "nodemon index.js",
+    "build": "cd client && npm run build",
+    "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\"",
+    "postinstall": "cd client && npm install",
+    "heroku-postbuild": "cd client && npm install && npm install --only=dev --no-shrinkwrap && npm run build"
   },
   "author": "Tiago Menezes de Lima",
   "license": "ISC",
@@ -21,6 +26,7 @@
     "mysql2": "^2.3.3"
   },
   "devDependencies": {
+    "concurrently": "^7.3.0",
     "nodemon": "^2.0.19"
   }
 }
