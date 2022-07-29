@@ -9,7 +9,9 @@ class MySQL {
 
     this.#table = table;
     pool.query(sql, (error) => {
-      if (error) console.error(`${this.#table} Table not created: ${error}`);
+      // fatal already logged on index
+      if (error && !error.fatal)
+        console.error(`${this.#table} Table not created: ${error}`);
     });
   }
 
@@ -20,7 +22,7 @@ class MySQL {
       const result = await this.getOneByParams({ id: insertId });
       return result;
     } catch (error) {
-      console.error(error);
+      if (!error.fatal) console.error(error); // propagated if fatal, already logged on index
     }
   }
 
@@ -30,7 +32,7 @@ class MySQL {
       const results = await mysql.selectAll(this.#table);
       return results;
     } catch (error) {
-      console.error(error);
+      if (!error.fatal) console.error(error); // propagated if fatal, already logged on index
     }
   }
 
@@ -40,7 +42,7 @@ class MySQL {
       const [result] = await mysql.selectByParams(searchParams, this.#table);
       return result;
     } catch (error) {
-      console.error(error);
+      if (!error.fatal) console.error(error); // propagated if fatal, already logged on index
     }
   }
 
@@ -51,7 +53,7 @@ class MySQL {
       const result = await this.getOneByParams({ id });
       return result;
     } catch (error) {
-      console.error(error);
+      if (!error.fatal) console.error(error); // propagated if fatal, already logged on index
     }
   }
 
@@ -62,7 +64,7 @@ class MySQL {
       await mysql.deleteById(id, this.#table);
       return result;
     } catch (error) {
-      console.error(error);
+      if (!error.fatal) console.error(error); // propagated if fatal, already logged on index
     }
   }
 }
