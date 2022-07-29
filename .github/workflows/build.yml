@@ -8,6 +8,12 @@ jobs:
     name: Build with Node
     runs-on: ubuntu-latest
     container: node:16.16.0
+    environment: ford-desafio-tiagolima
+    env:
+      DB_HOST: ${{ secrets.DB_HOST }}
+      DB_USER: ${{ secrets.DB_USER }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      DB_SCHEMA: ${{ secrets.DB_SCHEMA }}
     steps:
       - name: Check Node installation
         run: node -v & npm -v
