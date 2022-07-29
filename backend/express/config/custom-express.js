@@ -25,11 +25,15 @@ module.exports = () => {
   app.use(express.json());
   app.use(cookieParser());
 
-  //serve static files
-  app.use("/", express.static(path.join(__dirname, "../public")));
+  // serve static files for angular app
+  app.use(
+    "/",
+    express.static(
+      path.join(__dirname, "..", "..", "..", "frontend", "dist", "angular-app")
+    )
+  );
 
   // routes
-  app.use("/", require("../routes/root"));
   app.use("/register", require("../routes/register"));
   app.use("/login", require("../routes/login"));
   app.use("/logout", require("../routes/logout"));
@@ -37,8 +41,9 @@ module.exports = () => {
 
   app.use("/vehicles", require("../routes/api/vehicles"));
   app.use("/vehiclesData", require("../routes/api/vehicles-data"));
-  app.use("/users", require("../routes/api/users"));
-  app.use(verifyJWT); // users api require auth
+  app.use("/users", verifyJWT, require("../routes/api/users"));
+
+  app.use("/", require("../routes/angular-app"));
 
   return app;
 };

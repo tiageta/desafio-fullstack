@@ -1,3 +1,3 @@
-const allowedOrigins = ["http://localhost:4200"];
+const allowedOrigins = ["https://ford-desafio-tiagolima.herokuapp.com"];
 
 module.exports = allowedOrigins;
