@@ -20,7 +20,7 @@ class User extends MySQL {
     super
       .getAll()
       .then((users) => {
-        if (users.length) return;
+        if (users?.length) return;
         mockUsers.forEach((user) => {
           bcrypt
             .hash(user.password, 10)

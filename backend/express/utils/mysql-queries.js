@@ -1,21 +1,17 @@
-const connection = require("../config/db-connection");
+const pool = require("../config/db-connection");
 
 const insert = (values, table) => {
   return new Promise((resolve, reject) => {
-    connection.query(
-      `INSERT INTO ?? SET ?`,
-      [table, values],
-      (error, results) => {
-        if (error) reject(error);
-        resolve(results);
-      }
-    );
+    pool.query(`INSERT INTO ?? SET ?`, [table, values], (error, results) => {
+      if (error) reject(error);
+      resolve(results);
+    });
   });
 };
 
 const selectAll = (table) => {
   return new Promise((resolve, reject) => {
-    connection.query(`SELECT * FROM ??`, table, (error, results) => {
+    pool.query(`SELECT * FROM ??`, table, (error, results) => {
       if (error) reject(error);
       resolve(results);
     });
@@ -24,7 +20,7 @@ const selectAll = (table) => {
 
 const selectByParams = (params, table) => {
   return new Promise((resolve, reject) => {
-    connection.query(
+    pool.query(
       `SELECT * FROM ?? WHERE ?`,
       [table, params],
       (error, results) => {
@@ -37,7 +33,7 @@ const selectByParams = (params, table) => {
 
 const updateById = (id, values, table) => {
   return new Promise((resolve, reject) => {
-    connection.query(
+    pool.query(
       `UPDATE ?? SET ? WHERE id=?`,
       [table, values, id],
       (error, results) => {
@@ -50,14 +46,10 @@ const updateById = (id, values, table) => {
 
 const deleteById = (id, table) => {
   return new Promise((resolve, reject) => {
-    connection.query(
-      `DELETE FROM ?? WHERE id=?`,
-      [table, id],
-      (error, results) => {
-        if (error) reject(error);
-        resolve(results);
-      }
-    );
+    pool.query(`DELETE FROM ?? WHERE id=?`, [table, id], (error, results) => {
+      if (error) reject(error);
+      resolve(results);
+    });
   });
 };
 
