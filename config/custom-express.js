@@ -28,9 +28,7 @@ module.exports = () => {
   // serve static files for angular app
   app.use(
     "/",
-    express.static(
-      path.join(__dirname, "..", "..", "..", "frontend", "dist", "angular-app")
-    )
+    express.static(path.join(__dirname, "..", "client", "dist", "angular-app"))
   );
 
   // routes

@@ -1,17 +1,31 @@
 {
   "name": "desafio-fullstack",
   "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
   "private": true,
   "scripts": {
-    "app": "cd frontend && ng serve",
-    "build": "cd frontend && ng build",
-    "api": "cd backend/express && npm run dev",
-    "dev": "concurrently --kill-others-on-fail \"npm run app\" \"npm run api\"",
-    "postinstall": "cd frontend && npm install && cd ../backend/express && npm install",
-    "heroku-postbuild": "cd frontend && npm install && npm run build"
+    "client": "cd client && ng serve",
+    "server": "nodemon index.js",
+    "build": "cd client && npm run build",
+    "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\"",
+    "postinstall": "cd client && npm install",
+    "heroku-postbuild": "cd client && npm install && npm install --only=dev --no-shrinkwrap && npm run build"
   },
-  "homepage": "https://github.com/tiageta/angular-app#readme",
+  "author": "Tiago Menezes de Lima",
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt": "^5.0.1",
+    "consign": "^0.1.6",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.1",
+    "express": "^4.18.1",
+    "jsonwebtoken": "^8.5.1",
+    "mysql2": "^2.3.3"
+  },
   "devDependencies": {
-    "concurrently": "^7.3.0"
+    "concurrently": "^7.3.0",
+    "nodemon": "^2.0.19"
   }
 }

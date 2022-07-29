@@ -4,16 +4,7 @@ const path = require("path");
 
 router.get("*", (req, res) => {
   res.sendFile(
-    path.join(
-      __dirname,
-      "..",
-      "..",
-      "..",
-      "frontend",
-      "dist",
-      "angular-app",
-      "index.html"
-    )
+    path.join(__dirname, "..", "client", "dist", "angular-app", "index.html")
   );
 });
 
