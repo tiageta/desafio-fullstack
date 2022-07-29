@@ -1,0 +1,27 @@
+name: Build application workflow
+on:
+  push:
+    branches:
+      - main
+jobs:
+  build:
+    name: Build with Node
+    runs-on: ubuntu-latest
+    container: node:16.16.0
+    steps:
+      - name: Check Node installation
+        run: node -v & npm -v
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Use Node.js 16.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+          cache: "npm"
+      - name: Install NPM dependencies for API
+        run: npm ci
+      - name: Install NPM dependencies for Angular client
+        working-directory: ./client
+        run: npm ci
+      - name: Start server with API
+        run: npm start
