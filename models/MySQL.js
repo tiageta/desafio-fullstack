@@ -8,6 +8,7 @@ class MySQL {
     if (!table || !sql) throw "Table and SQL need to be declared in Model";
 
     this.#table = table;
+    // Try to create tables
     pool.query(sql, (error) => {
       // fatal already logged on index
       if (error && !error.fatal)
@@ -18,9 +19,10 @@ class MySQL {
   /** @returns Created record */
   async create(record) {
     try {
+      // Insert record and retrieve its ID
       const { insertId } = await mysql.insert(record, this.#table);
-      const result = await this.getOneByParams({ id: insertId });
-      return result;
+      // Return newly inserted record
+      return await this.getOneByParams({ id: insertId });
     } catch (error) {
       if (!error.fatal) console.error(error); // propagated if fatal, already logged on index
     }
@@ -29,8 +31,8 @@ class MySQL {
   /** @returns Array of records */
   async getAll() {
     try {
-      const results = await mysql.selectAll(this.#table);
-      return results;
+      // Return all records from database
+      return await mysql.selectAll(this.#table);
     } catch (error) {
       if (!error.fatal) console.error(error); // propagated if fatal, already logged on index
     }
@@ -39,8 +41,10 @@ class MySQL {
   /** @returns First record matching search params */
   async getOneByParams(searchParams) {
     try {
-      const [result] = await mysql.selectByParams(searchParams, this.#table);
-      return result;
+      // Get a single record matching params
+      const [record] = await mysql.selectByParams(searchParams, this.#table);
+
+      return record;
     } catch (error) {
       if (!error.fatal) console.error(error); // propagated if fatal, already logged on index
     }
@@ -49,9 +53,10 @@ class MySQL {
   /** @returns Updated record */
   async updateById(id, values) {
     try {
+      // Update record matching id
       await mysql.updateById(id, values, this.#table);
-      const result = await this.getOneByParams({ id });
-      return result;
+      // Return updated record
+      return await this.getOneByParams({ id });
     } catch (error) {
       if (!error.fatal) console.error(error); // propagated if fatal, already logged on index
     }
@@ -60,8 +65,11 @@ class MySQL {
   /** @returns Deleted record */
   async deleteById(id) {
     try {
+      // Get record to return later
       const result = await this.getOneByParams({ id });
+      // Delete record matching ID
       await mysql.deleteById(id, this.#table);
+
       return result;
     } catch (error) {
       if (!error.fatal) console.error(error); // propagated if fatal, already logged on index
