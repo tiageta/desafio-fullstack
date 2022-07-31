@@ -1,4 +1,3 @@
-const pool = require("../config/db-connection");
 const mysql = require("../utils/mysql-queries");
 
 class MySQL {
@@ -9,9 +8,9 @@ class MySQL {
 
     this.#table = table;
     // Try to create tables
-    pool.query(sql, (error) => {
+    mysql.createTable(sql).catch((error) => {
       // fatal already logged on index
-      if (error && !error.fatal)
+      if (!error.fatal)
         console.error(`${this.#table} Table not created: ${error}`);
     });
   }
