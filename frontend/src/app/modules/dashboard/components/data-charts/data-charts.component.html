@@ -1,18 +1,18 @@
-<div class="container p-0">
-  <div
-    class="charts d-flex flex-wrap justify-content-center justify-content-lg-between gap-2"
-  >
-    <div *ngFor="let chart of charts" class="chart">
-      <div class="title d-lg-none">{{ chart.title }}</div>
+<div class="container">
+  <div class="charts row gap-2 gap-md-0 justify-content-center">
+    <div *ngFor="let chart of charts" class="chart-wrapper col-12 col-lg-6">
       <div class="body">
-        <span
-          *ngIf="!haveChartsLoaded"
-          class="spinner-border spinner-border-sm"
-          role="status"
-        ></span>
-        <div #chartElements></div>
+        <div class="loading-wrapper" *ngIf="!selectedVehicle">
+          <span class="spinner-border loading" role="status"></span>
+        </div>
+        <div
+          [ngStyle]="{ opacity: !selectedVehicle ? '0' : '1' }"
+          #chartElements
+          class="chart"
+        ></div>
       </div>
       <div class="value text-primary">{{ chart.percent }}</div>
+      <div class="title text-primary">{{ chart.title }}</div>
     </div>
   </div>
 </div>

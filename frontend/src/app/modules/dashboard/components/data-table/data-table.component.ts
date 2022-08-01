@@ -1,28 +1,21 @@
 import { animate, style, transition, trigger } from '@angular/animations';
 import { HttpResponse } from '@angular/common/http';
-import {
-  Component,
-  ElementRef,
-  OnDestroy,
-  OnInit,
-  ViewChild,
-} from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormControl, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import {
   debounceTime,
+  filter,
   finalize,
   map,
-  merge,
   Observable,
   Observer,
   repeat,
+  shareReplay,
   Subject,
-  Subscription,
-  switchMap,
   tap,
 } from 'rxjs';
-import { ModalComponent } from '../modal/modal.component';
+import { DataModalComponent } from '../data-modal/data-modal.component';
 import { ModalOptions } from '../../interfaces/modal-options.model';
 import { VehicleData, VehiclesData } from 'src/app/shared/models/vehicle.model';
 import { TableField, TableFields } from '../../interfaces/table-field';
@@ -44,15 +37,17 @@ const INPUT_DEBOUNCE_MS = 200;
     ]),
   ],
 })
-export class DataTableComponent implements OnInit, OnDestroy {
+export class DataTableComponent implements OnInit {
   private _httpGetNotifier$ = new Subject<void>();
   private _allVehiclesData: VehiclesData = [];
-  private _allVehiclesDataSub = new Subscription();
-  private _filteredVehicleData: VehicleData = {};
-  private _filteredVehicleDataSub = new Subscription();
+  private _matchedVehicleData: VehicleData = {};
   private _inputtedVin = '';
   private _isVinValid = false;
   private _hasVinMatched = false;
+
+  get isVinValid() {
+    return this._isVinValid;
+  }
 
   isLoadingTableData = false;
   isWaitingResponse = false;
@@ -60,21 +55,53 @@ export class DataTableComponent implements OnInit, OnDestroy {
   mayUpdate = false;
   mayDelete = false;
 
-  searchedVin = new FormControl(
-    { value: '', disabled: true },
-    Validators.required
-  );
+  searchedVin = new FormControl({ value: '', disabled: true }, [
+    Validators.required,
+  ]);
+
+  maxVinLength = VIN_LENGTH;
+
+  get isVinMinLength() {
+    return this.searchedVin.value.length > 2;
+  }
 
   @ViewChild('vinInput')
   vinInputElement: ElementRef | undefined;
 
-  allVehiclesData$: Observable<VehiclesData> = this.vehiclesDataService
+  private _allVehiclesData$: Observable<VehiclesData> = this.vehiclesDataService
     .getVehiclesData()
-    .pipe(repeat({ delay: () => this._httpGetNotifier$ }));
+    .pipe(
+      repeat({ delay: () => this._httpGetNotifier$ }),
+      map((allVehiclesData, index) => {
+        // Only on first subscribe
+        if (index === 0) {
+          // Enables input field
+          this.searchedVin.enable({
+            onlySelf: true,
+            emitEvent: false,
+          });
+          // Gets first data to populate page on reload
+          if (allVehiclesData.length) {
+            this.searchedVin.setValue(allVehiclesData[0].vin ?? '');
+            // Triggers flags logic
+            this.searchedVin.updateValueAndValidity({
+              onlySelf: true,
+              emitEvent: true,
+            });
+          }
+        }
+        return allVehiclesData;
+      }),
+      shareReplay(1)
+    );
 
   filteredVehiclesData$: Observable<VehiclesData> =
     this.searchedVin.valueChanges.pipe(
       debounceTime(INPUT_DEBOUNCE_MS),
+      filter(
+        (inputtedValue) =>
+          this.isVinMinLength || inputtedValue.length < this._inputtedVin.length // _inputtedVin holds previous value; do not filter when erasing
+      ),
       map((inputtedValue: string) => {
         // Converts value to uppercase in forms
         const upperCaseInputtedValue = inputtedValue.toUpperCase();
@@ -100,17 +127,14 @@ export class DataTableComponent implements OnInit, OnDestroy {
           });
         }
 
-        // Unfocus input field as to not popup datalist on data load
-        if (this._hasVinMatched && this.vinInputElement) {
-          this.vinInputElement.nativeElement.blur();
-        }
-
         // Sets flag that triggers spinner in template
-        this.isLoadingTableData =
-          this._hasVinMatched || (!this._hasVinMatched && this._isVinValid);
+        this.isLoadingTableData = this._hasVinMatched;
       }),
-      switchMap((inputtedValue) =>
-        this.vehiclesDataService.getVehiclesData(inputtedValue)
+      map((inputtedValue) =>
+        this._allVehiclesData.filter((vehicleData) => {
+          if (vehicleData.vin) return vehicleData.vin.includes(inputtedValue);
+          return [];
+        })
       ),
       tap(() => {
         // Enables delete button
@@ -120,22 +144,10 @@ export class DataTableComponent implements OnInit, OnDestroy {
         this.mayCreate = this._isVinValid && !this._hasVinMatched;
         if (this.mayCreate) this.refreshCreateOptions();
 
-        // Controls final state of loading flag
+        // Resets loading flag
         this.isLoadingTableData = false;
       })
     );
-
-  vehiclesData$: Observable<VehiclesData> = merge(
-    this.allVehiclesData$,
-    this.filteredVehiclesData$
-  ).pipe(
-    tap(() =>
-      this.searchedVin.enable({
-        onlySelf: true,
-        emitEvent: false,
-      })
-    )
-  );
 
   tableFields: TableFields = [
     { header: 'Código - Vin' },
@@ -160,7 +172,28 @@ export class DataTableComponent implements OnInit, OnDestroy {
     private modalService: NgbModal
   ) {}
 
-  private refreshVehiclesData() {
+  ngOnInit(): void {
+    // Initially gets all vehicles data for better search performance.
+    // This strategy would not be scalable and was only chosen to select
+    // data more easily, focusing on testing other core features of this app
+    this._allVehiclesData$.subscribe((allVehiclesData) => {
+      this._allVehiclesData = allVehiclesData;
+    });
+
+    // Populates table fields with filtered data
+    this.filteredVehiclesData$.subscribe((filteredVehiclesData) => {
+      if (filteredVehiclesData.length !== 1 || !this._hasVinMatched) return;
+      this._matchedVehicleData = filteredVehiclesData[0];
+      this.tableFields.forEach((field) => {
+        if (!field.type) return;
+        field.value = this._matchedVehicleData[field.type]?.toString() ?? '';
+        field.dirty = false;
+      });
+      if (this.mayDelete) this.refreshDeleteOptions();
+    });
+  }
+
+  private refreshVehiclesData(): void {
     this._httpGetNotifier$.next();
     // Triggers observable where all logic for flags is implemented
     this.searchedVin.updateValueAndValidity({
@@ -169,32 +202,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
     });
   }
 
-  ngOnInit(): void {
-    this._allVehiclesDataSub = this.allVehiclesData$.subscribe(
-      (allVehiclesData) => (this._allVehiclesData = allVehiclesData)
-    );
-
-    // Populates table fields with filtered data
-    this._filteredVehicleDataSub = this.filteredVehiclesData$.subscribe(
-      (filteredVehiclesData) => {
-        if (filteredVehiclesData.length !== 1) return;
-        this._filteredVehicleData = filteredVehiclesData[0];
-        this.tableFields.forEach((field) => {
-          if (!field.type) return;
-          field.value = this._filteredVehicleData[field.type]?.toString() ?? '';
-          field.dirty = false;
-        });
-        if (this.mayDelete) this.refreshDeleteOptions();
-      }
-    );
-  }
-
-  ngOnDestroy(): void {
-    this._allVehiclesDataSub.unsubscribe();
-    this._filteredVehicleDataSub.unsubscribe();
-  }
-
-  vinMatchVehicleData(vin: string): boolean {
+  private vinMatchVehicleData(vin: string): boolean {
     return !!this._allVehiclesData.find(
       // redundancy check to uppercase, already handled in pipe
       (vehicleData) => vehicleData.vin?.toUpperCase() === vin.toUpperCase()
@@ -202,9 +210,10 @@ export class DataTableComponent implements OnInit, OnDestroy {
   }
 
   handleDirtyField(tableField: TableField): void {
-    const originalValue = tableField.type
-      ? this._filteredVehicleData[tableField.type]
-      : undefined;
+    const originalValue =
+      tableField.type && this._hasVinMatched
+        ? this._matchedVehicleData[tableField.type]
+        : undefined;
     tableField.dirty = this.getFieldValue(tableField.type) !== originalValue;
 
     this.mayUpdate = this._hasVinMatched && this.isAnyFieldDirty(); // Enables update button
@@ -234,7 +243,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
     this.updateOptions = {
       action: 'update',
       body: {
-        vin: this._filteredVehicleData.vin ?? '',
+        vin: this._matchedVehicleData.vin ?? '',
         odometer: this.getFieldValue('odometer'),
         fuelLevel: this.getFieldValue('fuelLevel'),
         vehicleStatus: this.getFieldValue('vehicleStatus'),
@@ -255,12 +264,12 @@ export class DataTableComponent implements OnInit, OnDestroy {
     this.deleteOptions = {
       action: 'delete',
       body: {
-        vin: this._filteredVehicleData.vin ?? '',
-        odometer: this._filteredVehicleData.odometer ?? '',
-        fuelLevel: this._filteredVehicleData.fuelLevel ?? '',
-        vehicleStatus: this._filteredVehicleData.vehicleStatus ?? '',
-        latitude: this._filteredVehicleData.latitude ?? '',
-        longitude: this._filteredVehicleData.longitude ?? '',
+        vin: this._matchedVehicleData.vin ?? '',
+        odometer: this._matchedVehicleData.odometer ?? '',
+        fuelLevel: this._matchedVehicleData.fuelLevel ?? '',
+        vehicleStatus: this._matchedVehicleData.vehicleStatus ?? '',
+        latitude: this._matchedVehicleData.latitude ?? '',
+        longitude: this._matchedVehicleData.longitude ?? '',
       },
     };
   }
@@ -284,7 +293,9 @@ export class DataTableComponent implements OnInit, OnDestroy {
 
     if (!modalOptions) return;
 
-    const modalRef = this.modalService.open(ModalComponent, { centered: true });
+    const modalRef = this.modalService.open(DataModalComponent, {
+      centered: true,
+    });
     modalRef.componentInstance.modalOptions = modalOptions;
     modalRef.result.then(
       () => {
@@ -335,7 +346,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
   httpHandle(action: string): Partial<Observer<HttpResponse<VehicleData>>> {
     return {
       complete: () => {
-        const modalRef = this.modalService.open(ModalComponent, {
+        const modalRef = this.modalService.open(DataModalComponent, {
           centered: true,
         });
         modalRef.componentInstance.modalOptions = { action };
@@ -347,7 +358,7 @@ export class DataTableComponent implements OnInit, OnDestroy {
 
   errorHandle(): void {
     this.isWaitingResponse = false;
-    const modalRef = this.modalService.open(ModalComponent, {
+    const modalRef = this.modalService.open(DataModalComponent, {
       centered: true,
     });
     modalRef.componentInstance.modalOptions = { action: 'error' };

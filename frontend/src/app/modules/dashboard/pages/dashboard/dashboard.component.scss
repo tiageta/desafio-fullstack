@@ -4,16 +4,11 @@
   padding-bottom: 108px; // table height
 
   #grid-wrapper {
-    grid-template-columns: repeat(4, 14rem);
+    grid-template-columns: repeat(2, 1fr);
     justify-content: space-between;
     align-items: center;
-    #image {
-      grid-column: 1 / 3;
-      width: 100%;
-      height: 100%;
-    }
+    #image,
     #charts {
-      grid-column: 3 / 5;
       width: 100%;
       height: 100%;
     }

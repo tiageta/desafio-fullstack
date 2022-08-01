@@ -9,7 +9,7 @@ import { DataTableComponent } from './components/data-table/data-table.component
 import { DataCardsComponent } from './components/data-cards/data-cards.component';
 import { CarImageComponent } from './components/car-image/car-image.component';
 import { DataChartsComponent } from './components/data-charts/data-charts.component';
-import { ModalComponent } from './components/modal/modal.component';
+import { DataModalComponent } from './components/data-modal/data-modal.component';
 
 @NgModule({
   declarations: [
@@ -18,7 +18,7 @@ import { ModalComponent } from './components/modal/modal.component';
     DataCardsComponent,
     CarImageComponent,
     DataChartsComponent,
-    ModalComponent,
+    DataModalComponent,
   ],
   imports: [
     CommonModule,
