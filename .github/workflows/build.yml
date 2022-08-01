@@ -29,5 +29,8 @@ jobs:
       - name: Install NPM dependencies for Angular client
         working-directory: ./client
         run: npm ci
-      - name: Start server with API
-        run: npm start
+      - name: Run tests for server API
+        run: npm test
+      - name: Build Angular application
+        working-directory: ./client
+        run: npm run build
