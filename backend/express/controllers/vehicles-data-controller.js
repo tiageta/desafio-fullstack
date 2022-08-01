@@ -15,7 +15,7 @@ const createNewVehicleData = async (req, res) => {
 
 const getAllVehiclesData = async (req, res) => {
   const vehiclesData = await VehicleData.getAll();
-  if (!vehiclesData.length)
+  if (!vehiclesData?.length)
     return res.status(404).json({ message: "No vehicles data found." });
 
   res.json({ data: vehiclesData });
