@@ -1,21 +1,28 @@
-<div *ngIf="{ vehiclesData: vehiclesData$ | async } as vd">
-  <div class="table-responsive">
-    <table class="mb-0">
-      <thead>
-        <tr class="d-flex bg-primary text-white">
-          <th *ngFor="let tableField of tableFields" class="col" scope="col">
-            {{ tableField.header }}
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr class="d-flex pt-1 pb-1">
-          <td *ngFor="let tableField of tableFields" class="col">
-            <ng-container *ngIf="!tableField.data; else dataCol">
+<app-loading *ngIf="isWaitingResponse"></app-loading>
+
+<div
+  *ngIf="{ vehiclesData: vehiclesData$ | async } as vd"
+  class="table-responsive"
+>
+  <table class="mb-0">
+    <thead>
+      <tr class="d-flex bg-primary text-white">
+        <th *ngFor="let tableField of tableFields" class="col" scope="col">
+          {{ tableField.header }}
+        </th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr class="d-flex pt-1 pb-1">
+        <td *ngFor="let tableField of tableFields" class="col">
+          <!-- Input field -->
+          <ng-container *ngIf="!tableField.type; else dataCol">
+            <div class="input-field d-flex gap-3">
               <input
                 #vinInput
                 list="dataVehicles"
-                class="form-control-sm"
+                class="form-control-sm flex-grow-1"
                 type="text"
                 [formControl]="searchedVin"
               />
@@ -24,41 +31,75 @@
                   {{ vehicleData.vin }}
                 </option>
               </datalist>
-            </ng-container>
-            <ng-template #dataCol>
-              <ng-container *ngIf="vd.vehiclesData; else placeholder">
-                <span
-                  *ngIf="!isLoadingTableData; else spinnerBlock"
-                  class="fw-bold"
+
+              <div class="crud-buttons d-flex gap-1 align-items-center">
+                <button
+                  class="btn btn-success"
+                  [disabled]="!mayCreate"
+                  (click)="openModal('create')"
                 >
-                  {{
-                    getDataFromVehicle(tableField.data, vd.vehiclesData).concat(
-                      tableField.unit ?? ""
-                    )
-                  }}</span
+                  <i class="fa fa-solid fa-plus fa-sm"></i>
+                </button>
+                <button
+                  class="btn btn-secondary"
+                  [disabled]="!mayUpdate"
+                  (click)="openModal('update')"
                 >
-                <ng-template #spinnerBlock>
-                  <span
-                    @delaySpinner
-                    class="spinner-border spinner-border-sm"
-                    role="status"
-                  ></span>
-                </ng-template>
-              </ng-container>
-              <ng-template #placeholder>
-                <div class="placeholder-glow">
-                  <span class="placeholder col-2">&nbsp;</span>
+                  <i class="fa fa-solid fa-refresh fa-sm"></i>
+                </button>
+                <button
+                  class="btn btn-danger"
+                  [disabled]="!mayDelete"
+                  (click)="openModal('delete')"
+                >
+                  <i class="fa fa-solid fa-trash fa-sm"></i>
+                </button>
+              </div>
+            </div>
+          </ng-container>
+
+          <!-- Data fields -->
+          <ng-template #dataCol>
+            <ng-container *ngIf="vd.vehiclesData; else placeholder">
+              <ng-container *ngIf="!isLoadingTableData; else spinnerBlock">
+                <div class="data-field input-group flex-nowrap">
+                  <input
+                    class="fw-bold w-100 form-control-sm text-end"
+                    placeholder="-"
+                    [(ngModel)]="tableField.value"
+                    (ngModelChange)="handleDirtyField(tableField)"
+                    [ngClass]="{ 'text-success': tableField.dirty }"
+                  />
+                  <span *ngIf="!!tableField.unit" class="input-group-text unit">
+                    {{ tableField.unit }}
+                  </span>
                 </div>
+              </ng-container>
+
+              <!-- Loading effect for data fields -->
+              <ng-template #spinnerBlock>
+                <span
+                  @delaySpinner
+                  class="spinner-border spinner-border-sm d-block m-auto"
+                  role="status"
+                ></span>
               </ng-template>
+            </ng-container>
+
+            <!-- Placeholder for data fields -->
+            <ng-template #placeholder>
+              <div class="placeholder-glow">
+                <span class="placeholder col-12">&nbsp;</span>
+              </div>
             </ng-template>
-          </td>
-        </tr>
-      </tbody>
-      <tfoot>
-        <tr>
-          <td colspan="100%" class="bg-primary"></td>
-        </tr>
-      </tfoot>
-    </table>
-  </div>
+          </ng-template>
+        </td>
+      </tr>
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="100%" class="bg-primary"></td>
+      </tr>
+    </tfoot>
+  </table>
 </div>

@@ -5,11 +5,30 @@ table {
   color: #212529;
   border-color: #dee2e6;
 
-  input {
-    &:disabled {
-      background-color: #ddd;
+  .input-field {
+    max-width: 85% !important;
+    input {
+      &:disabled {
+        background-color: #ddd;
+      }
     }
-    width: 75% !important;
+    .crud-buttons {
+      button {
+        display: flex;
+        padding: 0.5em;
+      }
+    }
+  }
+
+  .data-field {
+    .unit {
+      position: relative;
+      z-index: -1;
+      font-size: 0.8em;
+      font-weight: 600;
+      color: #444;
+      padding-inline: 0.2em;
+    }
   }
 
   td,
@@ -27,9 +46,9 @@ table {
       display: grid;
       align-items: center;
       min-height: 3rem;
-      min-width: 7rem;
+      min-width: 8rem;
       &:first-child {
-        flex-grow: 1.5 !important;
+        flex-grow: 3.5 !important;
       }
     }
   }
@@ -37,4 +56,10 @@ table {
   tfoot {
     height: 0.5em;
   }
+}
+
+.fa-sm {
+  font-size: 0.75em;
+  height: 0.75em;
+  width: 0.75em;
 }
