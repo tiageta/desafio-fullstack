@@ -1,0 +1,18 @@
+<div class="modal-header">
+  <button
+    type="button"
+    class="btn-close"
+    style="font-size: 0.85em"
+    (click)="activeModel.dismiss()"
+  ></button>
+</div>
+
+<div class="modal-body text-break">
+  {{ message }}
+</div>
+
+<div class="modal-footer pt-1 pb-1">
+  <button type="button" class="btn btn-light" (click)="activeModel.dismiss()">
+    Fechar
+  </button>
+</div>

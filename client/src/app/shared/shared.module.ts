@@ -4,6 +4,7 @@ import { MessageComponent } from './components/message/message.component';
 import { NavTogglerIconComponent } from './components/nav-toggler-icon/nav-toggler-icon.component';
 import { ScrollBlockDirective } from './directives/scroll-block.directive';
 import { LoadingComponent } from './components/loading/loading.component';
+import { AlertModalComponent } from './components/alert-modal/alert-modal.component';
 
 @NgModule({
   declarations: [
@@ -11,12 +12,14 @@ import { LoadingComponent } from './components/loading/loading.component';
     NavTogglerIconComponent,
     ScrollBlockDirective,
     LoadingComponent,
+    AlertModalComponent,
   ],
   imports: [CommonModule],
   exports: [
     MessageComponent,
     NavTogglerIconComponent,
     LoadingComponent,
+    AlertModalComponent,
     ScrollBlockDirective,
   ],
 })
