@@ -28,11 +28,20 @@
   }
 
   .menu {
-    min-height: 100vh;
-    width: 20em;
-    max-width: 100vw;
+    overflow: auto;
     background: white;
-    position: relative;
     z-index: 1;
+    position: relative;
+
+    &.mobile {
+      min-height: 35vh;
+      max-height: 50vh;
+      width: 100vw;
+    }
+    &.desktop {
+      height: 100vh;
+      width: 20em;
+      max-width: 100vw;
+    }
   }
 }

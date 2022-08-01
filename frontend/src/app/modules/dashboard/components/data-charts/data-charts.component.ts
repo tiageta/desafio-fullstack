@@ -4,10 +4,14 @@ import {
   ElementRef,
   Input,
   OnChanges,
+  QueryList,
   SimpleChanges,
-  ViewChild,
+  ViewChildren,
 } from '@angular/core';
 import { Vehicle } from 'src/app/shared/models/vehicle.model';
+import { DataCharts } from '../../interfaces/data-chart';
+
+type HTMLElementRef = ElementRef<HTMLElement>;
 
 @Component({
   selector: 'app-data-charts',
@@ -15,19 +19,37 @@ import { Vehicle } from 'src/app/shared/models/vehicle.model';
   styleUrls: ['./data-charts.component.scss'],
 })
 export class DataChartsComponent implements AfterViewInit, OnChanges {
-  private connectedData: google.visualization.DataTable | undefined;
-  private softwareData: google.visualization.DataTable | undefined;
-  private options: google.visualization.PieChartOptions | undefined;
+  private _chartRefsArray: HTMLElementRef[] | undefined;
 
-  @ViewChild('connectedChart') connectedChart: ElementRef | undefined;
-  @ViewChild('softwareChart') softwareChart: ElementRef | undefined;
+  @ViewChildren('chartElements') chartElementsRef:
+    | QueryList<HTMLElementRef>
+    | undefined;
   @Input() selectedVehicle: Vehicle | undefined;
 
   haveChartsLoaded = false;
-  percentConnected = '0.00%';
-  percentSoftware = '0.00%';
+
+  charts: DataCharts = [
+    {
+      title: 'Conectados',
+      legend: ['Connected', 'Not connected'],
+      percent: '0.00%',
+      getValue: this.getConnectedVehicles.bind(this),
+      getTotal: this.getTotalSales.bind(this),
+      getElement: this.getConnectedChartEl.bind(this),
+    },
+    {
+      title: 'Update Software',
+      legend: ['Software updated', 'Software not updated'],
+      percent: '0.00%',
+      getValue: this.getSoftwareVehicles.bind(this),
+      getTotal: this.getTotalSales.bind(this),
+      getElement: this.getSoftwareChartEl.bind(this),
+    },
+  ];
 
   ngAfterViewInit() {
+    // Get chart template refs
+    this._chartRefsArray = this.chartElementsRef?.toArray();
     // Load the Visualization API and the corechart package.
     google.charts.load('current', { packages: ['corechart'] });
     // Set a callback to run when the Google Visualization API is loaded.
@@ -40,38 +62,11 @@ export class DataChartsComponent implements AfterViewInit, OnChanges {
     if (this.haveChartsLoaded && changes['selectedVehicle']) this.drawCharts();
   }
 
-  // Callback that creates and populates a data table,
-  // instantiates the pie chart, passes in the data and
-  // draws it.
+  // Callback that instantiates the pie chart,
+  // passes in the data and draws it.
   drawCharts(): void {
-    const totalSales = this.selectedVehicle?.totalSales ?? 1; // necessary to print default empty chart
-    const connected = this.selectedVehicle?.connected ?? 0;
-    const softwareUpdated = this.selectedVehicle?.softwareUpdated ?? 0;
-
-    this.percentConnected = `${((100 * connected) / totalSales).toFixed(2)}%`;
-    this.percentSoftware = `${((100 * softwareUpdated) / totalSales).toFixed(
-      2
-    )}%`;
-
-    // Create the data tables
-    this.connectedData = new google.visualization.DataTable();
-    this.connectedData.addColumn('string');
-    this.connectedData.addColumn('number');
-    this.connectedData.addRows([
-      ['Connected', connected],
-      ['Not connected', totalSales - connected],
-    ]);
-
-    this.softwareData = new google.visualization.DataTable();
-    this.softwareData.addColumn('string');
-    this.softwareData.addColumn('number');
-    this.softwareData.addRows([
-      ['Software updated', softwareUpdated],
-      ['Software not updated', totalSales - softwareUpdated],
-    ]);
-
     // Set chart options
-    this.options = {
+    const options: google.visualization.PieChartOptions = {
       pieHole: 0.4,
       width: 224,
       pieSliceText: 'none',
@@ -87,19 +82,51 @@ export class DataChartsComponent implements AfterViewInit, OnChanges {
       colors: ['0d6efd', 'ccc'],
     };
 
-    // Instantiate and draw our chart, passing in some options.
-    if (this.connectedData && this.options && this.connectedChart) {
-      new google.visualization.PieChart(this.connectedChart.nativeElement).draw(
-        this.connectedData,
-        this.options
-      );
-    }
-    if (this.softwareData && this.options && this.softwareChart) {
-      new google.visualization.PieChart(this.softwareChart.nativeElement).draw(
-        this.softwareData,
-        this.options
-      );
-    }
-    this.haveChartsLoaded = true;
+    this.charts.forEach((chart) => {
+      const element = chart.getElement();
+      if (!element) return;
+
+      chart.percent = this.getPercent(chart.getValue(), chart.getTotal());
+
+      const data = new google.visualization.DataTable();
+      data.addColumn('string');
+      data.addColumn('number');
+      data.addRows([
+        [chart.legend[0], chart.getValue()],
+        [chart.legend[1], chart.getTotal() - chart.getValue()],
+      ]);
+
+      new google.visualization.PieChart(element).draw(data, options);
+
+      this.haveChartsLoaded = true;
+    });
+  }
+
+  getConnectedVehicles() {
+    return this.selectedVehicle?.connected ?? 0;
+  }
+
+  getSoftwareVehicles() {
+    return this.selectedVehicle?.softwareUpdated ?? 0;
+  }
+
+  getTotalSales() {
+    return this.selectedVehicle?.totalSales ?? 1; // necessary to print default empty chart
+  }
+
+  getPercent(value: number, total: number) {
+    return `${((100 * value) / total).toFixed(2)}%`;
+  }
+
+  getConnectedChartEl() {
+    // failed to get template ref
+    if (!this._chartRefsArray) return;
+    return this._chartRefsArray[0].nativeElement;
+  }
+
+  getSoftwareChartEl() {
+    // failed to get template ref
+    if (!this._chartRefsArray) return;
+    return this._chartRefsArray[1].nativeElement;
   }
 }
