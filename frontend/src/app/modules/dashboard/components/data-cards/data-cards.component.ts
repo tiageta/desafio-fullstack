@@ -9,7 +9,7 @@ import { VehiclesService } from '../../services/vehicles.service';
   styleUrls: ['./data-cards.component.scss'],
 })
 export class DataCardsComponent {
-  @Output() selectVehicleEvent = new EventEmitter<string>();
+  @Output() selectVehicleEvent = new EventEmitter<Vehicle>();
   selectedVehicle = '-';
 
   vehicles$ = this.vehiclesService.getVehicles();
@@ -23,11 +23,16 @@ export class DataCardsComponent {
   constructor(private vehiclesService: VehiclesService) {}
 
   private findSelectedVehicle(vehicles: Vehicles): Vehicle | undefined {
-    return vehicles.find((v) => v.vehicle === this.selectedVehicle);
+    return vehicles.find((vehicle) => vehicle.model === this.selectedVehicle);
+  }
+
+  emitSelectedVehicle(vehicles: Vehicles | null): void {
+    if (vehicles)
+      this.selectVehicleEvent.emit(this.findSelectedVehicle(vehicles));
   }
 
   getTotalSales(vehicles: Vehicles): number | string {
-    return this.findSelectedVehicle(vehicles)?.volumetotal ?? '-';
+    return this.findSelectedVehicle(vehicles)?.totalSales ?? '-';
   }
 
   getConnected(vehicles: Vehicles): number | string {
@@ -35,6 +40,6 @@ export class DataCardsComponent {
   }
 
   getSoftwareUpdate(vehicles: Vehicles): number | string {
-    return this.findSelectedVehicle(vehicles)?.softwareUpdates ?? '-';
+    return this.findSelectedVehicle(vehicles)?.softwareUpdated ?? '-';
   }
 }

@@ -1,5 +1,5 @@
 <!-- async pipe wrapped in object to always return true; used for placeholder logic -->
-<div class="container" *ngIf="{ vehicles: vehicles$ | async } as v">
+<div class="container mb-3" *ngIf="{ vehicles: vehicles$ | async } as v">
   <div
     class="d-flex flex-wrap gap-2 align-items-stretch justify-content-center justify-content-md-between"
   >
@@ -10,16 +10,12 @@
           class="form-select form-select-lg"
           [disabled]="!v.vehicles"
           [(ngModel)]="selectedVehicle"
-          (change)="selectVehicleEvent.emit(selectedVehicle)"
+          (change)="emitSelectedVehicle(v.vehicles)"
         >
           <ng-container *ngIf="!!v.vehicles">
             <option disabled selected value="-">-</option>
-            <option
-              *ngFor="let vehicle of v.vehicles"
-              [value]="vehicle.vehicle"
-            >
-              <!-- redudancy due to API naming convention -->
-              {{ vehicle.vehicle }}
+            <option *ngFor="let vehicle of v.vehicles" [value]="vehicle.model">
+              {{ vehicle.model }}
             </option>
           </ng-container>
         </select>

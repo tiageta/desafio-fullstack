@@ -18,9 +18,8 @@ export class TokenAuthInterceptor implements HttpInterceptor {
     next: HttpHandler
   ): Observable<HttpEvent<unknown>> {
     if (this.tokenService.hasToken()) {
-      /* Not needed by the API, only included because it was printing on screen I did not send it haha */
       const token = this.tokenService.getToken();
-      const headers = new HttpHeaders().append('x-access-token', token);
+      const headers = new HttpHeaders().append('authorization', token);
       request = request.clone({ headers });
     }
 

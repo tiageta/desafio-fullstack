@@ -1,31 +1,23 @@
-export interface Vehicles extends Array<Vehicle> {}
-
 export interface Vehicle {
-  id: number | string;
-  vehicle: string;
-  volumetotal: number | string;
-  connected: number | string;
-  softwareUpdates: number | string;
+  id: number;
+  model: string;
+  totalSales: number;
+  connected: number;
+  softwareUpdated: number;
 }
 
-export interface VehiclesAPI {
-  vehicles: Vehicles;
-}
+export type Vehicles = Vehicle[];
 
 export interface VehicleData {
-  id: number | string;
+  id: number;
   vin: string;
-  odometer: number | string;
-  fuelLevel: number | string;
-  status: string;
-  lat: number | string;
-  long: number | string;
+  odometer: string;
   tirePressure: string;
+  vehicleStatus: string;
   batteryStatus: string;
+  fuelLevel: string;
+  latitude: string;
+  longitude: string;
 }
 
-export interface VehiclesData extends Array<VehicleData> {}
-
-export interface VehiclesDataAPI {
-  vehicleData: VehiclesData;
-}
+export type VehiclesData = VehicleData[];

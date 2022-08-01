@@ -1,0 +1,33 @@
+<div class="container p-0">
+  <div
+    class="charts d-flex flex-wrap justify-content-center justify-content-lg-between gap-2"
+  >
+    <div class="chart">
+      <div class="title d-lg-none">Conectados</div>
+      <div class="body">
+        <span
+          *ngIf="!haveChartsLoaded"
+          class="spinner-border spinner-border-sm"
+          role="status"
+        ></span>
+        <div #connectedChart></div>
+      </div>
+      <div class="value text-primary">{{ percentConnected }}</div>
+    </div>
+
+    <div class="chart">
+      <div class="title d-lg-none">Update Software</div>
+      <div class="body">
+        <span
+          *ngIf="!haveChartsLoaded"
+          class="spinner-border spinner-border-sm"
+          role="status"
+        ></span>
+        <div #softwareChart></div>
+      </div>
+      <div class="value text-primary">{{ percentSoftware }}</div>
+    </div>
+  </div>
+</div>
+
+<ng-template #loading> </ng-template>
