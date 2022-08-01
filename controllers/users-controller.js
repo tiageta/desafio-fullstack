@@ -37,7 +37,7 @@ const createNewUser = async (req, res) => {
 
 const getAllUsers = async (req, res) => {
   const users = await User.getAll();
-  if (!users.length)
+  if (!users?.length)
     return res.status(404).json({ message: "No users found." });
 
   const sanitezedUsers = users.map((user) => sanitizeUser(user));

@@ -10,7 +10,7 @@ const LOGIN_TIMEOUT_MS = 10 * 1000; // 10s
   styleUrls: ['./app.component.scss'],
 })
 export class AppComponent {
-  title = 'desafio-angular';
+  title = 'angular-app';
 
   constructor(
     private userService: UserService,

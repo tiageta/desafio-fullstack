@@ -1,4 +1,4 @@
-const connection = require("../config/db-connection");
+const pool = require("../config/db-connection");
 const mysql = require("../utils/mysql-queries");
 
 class MySQL {
@@ -8,7 +8,7 @@ class MySQL {
     if (!table || !sql) throw "Table and SQL need to be declared in Model";
 
     this.#table = table;
-    connection.query(sql, (error) => {
+    pool.query(sql, (error) => {
       if (error) console.error(`${this.#table} Table not created: ${error}`);
     });
   }
