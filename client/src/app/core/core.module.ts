@@ -6,7 +6,8 @@ import { SharedModule } from '../shared/shared.module';
 import { MenuComponent } from './components/menu/menu.component';
 import { HTTP_INTERCEPTORS } from '@angular/common/http';
 import { TokenAuthInterceptor } from './interceptors/token-auth.interceptor';
-import { AuthCredentialsInterceptor } from './interceptors/auth-credentials.interceptor';
+import { TokenRefreshInterceptor } from './interceptors/token-refresh.interceptor';
+import { CredentialsInterceptor } from './interceptors/credentials.interceptor';
 
 @NgModule({
   declarations: [HeaderComponent, MenuComponent],
@@ -15,12 +16,17 @@ import { AuthCredentialsInterceptor } from './interceptors/auth-credentials.inte
   providers: [
     {
       provide: HTTP_INTERCEPTORS,
-      useClass: TokenAuthInterceptor,
+      useClass: CredentialsInterceptor,
       multi: true,
     },
     {
       provide: HTTP_INTERCEPTORS,
-      useClass: AuthCredentialsInterceptor,
+      useClass: TokenRefreshInterceptor,
+      multi: true,
+    },
+    {
+      provide: HTTP_INTERCEPTORS,
+      useClass: TokenAuthInterceptor,
       multi: true,
     },
   ],
