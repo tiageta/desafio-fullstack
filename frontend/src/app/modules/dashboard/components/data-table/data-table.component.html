@@ -36,27 +36,45 @@
               </datalist>
 
               <div class="crud-buttons d-flex gap-1 align-items-center">
-                <button
-                  class="btn btn-success"
-                  [disabled]="!mayCreate"
-                  (click)="openModal('create')"
+                <div
+                  placement="top"
+                  ngbTooltip="Digite um VIN de exatos 20 caracteres para habilitar a sua criação."
+                  [disableTooltip]="mayCreate"
                 >
-                  <i class="fa fa-solid fa-plus fa-sm"></i>
-                </button>
-                <button
-                  class="btn btn-secondary"
-                  [disabled]="!mayUpdate"
-                  (click)="openModal('update')"
+                  <button
+                    class="btn btn-success"
+                    [disabled]="!mayCreate"
+                    (click)="openModal('create')"
+                  >
+                    <i class="fa fa-solid fa-plus fa-sm"></i>
+                  </button>
+                </div>
+                <div
+                  placement="top"
+                  ngbTooltip="Edite o campo de algum VIN existente para habilitar a sua atualização."
+                  [disableTooltip]="mayUpdate"
                 >
-                  <i class="fa fa-solid fa-refresh fa-sm"></i>
-                </button>
-                <button
-                  class="btn btn-danger"
-                  [disabled]="!mayDelete"
-                  (click)="openModal('delete')"
+                  <button
+                    class="btn btn-secondary"
+                    [disabled]="!mayUpdate"
+                    (click)="openModal('update')"
+                  >
+                    <i class="fa fa-solid fa-refresh fa-sm"></i>
+                  </button>
+                </div>
+                <div
+                  placement="top"
+                  ngbTooltip="Digite algum VIN existente para habilitar o seu deletar."
+                  [disableTooltip]="mayDelete"
                 >
-                  <i class="fa fa-solid fa-trash fa-sm"></i>
-                </button>
+                  <button
+                    class="btn btn-danger"
+                    [disabled]="!mayDelete"
+                    (click)="openModal('delete')"
+                  >
+                    <i class="fa fa-solid fa-trash fa-sm"></i>
+                  </button>
+                </div>
               </div>
             </div>
           </ng-container>
