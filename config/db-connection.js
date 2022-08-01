@@ -1,10 +1,10 @@
 const db = require("mysql2");
 
-const connection = db.createPool({
-  host: "us-cdbr-east-06.cleardb.net",
-  user: "ba7ec75a83a7c1",
-  password: "7eaeef76",
-  database: "heroku_c77450bd68ea0f2",
+const pool = db.createPool({
+  host: process.env.DB_HOST || "localhost",
+  user: process.env.DB_USER || "root",
+  password: process.env.DB_PASSWORD || "",
+  database: process.env.DB_SCHEMA || "ford_api",
 });
 
-module.exports = connection;
+module.exports = pool;

@@ -1,4 +1,3 @@
-const pool = require("../config/db-connection");
 const mysql = require("../utils/mysql-queries");
 
 class MySQL {
@@ -8,61 +7,71 @@ class MySQL {
     if (!table || !sql) throw "Table and SQL need to be declared in Model";
 
     this.#table = table;
-    pool.query(sql, (error) => {
-      if (error) console.error(`${this.#table} Table not created: ${error}`);
+    // Try to create tables
+    mysql.createTable(sql).catch((error) => {
+      // fatal already logged on index
+      if (!error.fatal)
+        console.error(`${this.#table} Table not created: ${error}`);
     });
   }
 
   /** @returns Created record */
   async create(record) {
     try {
+      // Insert record and retrieve its ID
       const { insertId } = await mysql.insert(record, this.#table);
-      const result = await this.getOneByParams({ id: insertId });
-      return result;
+      // Return newly inserted record
+      return await this.getOneByParams({ id: insertId });
     } catch (error) {
-      console.error(error);
+      if (!error.fatal) console.error(error); // propagated if fatal, already logged on index
     }
   }
 
   /** @returns Array of records */
   async getAll() {
     try {
-      const results = await mysql.selectAll(this.#table);
-      return results;
+      // Return all records from database
+      return await mysql.selectAll(this.#table);
     } catch (error) {
-      console.error(error);
+      if (!error.fatal) console.error(error); // propagated if fatal, already logged on index
     }
   }
 
   /** @returns First record matching search params */
   async getOneByParams(searchParams) {
     try {
-      const [result] = await mysql.selectByParams(searchParams, this.#table);
-      return result;
+      // Get a single record matching params
+      const [record] = await mysql.selectByParams(searchParams, this.#table);
+
+      return record;
     } catch (error) {
-      console.error(error);
+      if (!error.fatal) console.error(error); // propagated if fatal, already logged on index
     }
   }
 
   /** @returns Updated record */
   async updateById(id, values) {
     try {
+      // Update record matching id
       await mysql.updateById(id, values, this.#table);
-      const result = await this.getOneByParams({ id });
-      return result;
+      // Return updated record
+      return await this.getOneByParams({ id });
     } catch (error) {
-      console.error(error);
+      if (!error.fatal) console.error(error); // propagated if fatal, already logged on index
     }
   }
 
   /** @returns Deleted record */
   async deleteById(id) {
     try {
+      // Get record to return later
       const result = await this.getOneByParams({ id });
+      // Delete record matching ID
       await mysql.deleteById(id, this.#table);
+
       return result;
     } catch (error) {
-      console.error(error);
+      if (!error.fatal) console.error(error); // propagated if fatal, already logged on index
     }
   }
 }

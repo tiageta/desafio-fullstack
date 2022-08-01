@@ -5,19 +5,19 @@
   "main": "index.js",
   "private": true,
   "scripts": {
+    "install:all": "npm install && (cd client && npm install)",
+    "test": "mocha --exit",
     "start": "node index.js",
     "client": "cd client && ng serve",
     "server": "nodemon index.js",
     "build": "cd client && npm run build",
     "dev": "concurrently --kill-others-on-fail \"npm run server\" \"npm run client\"",
-    "postinstall": "cd client && npm install",
     "heroku-postbuild": "cd client && npm install && npm install --only=dev --no-shrinkwrap && npm run build"
   },
   "author": "Tiago Menezes de Lima",
   "license": "ISC",
   "dependencies": {
     "bcrypt": "^5.0.1",
-    "consign": "^0.1.6",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
     "dotenv": "^16.0.1",
@@ -26,7 +26,10 @@
     "mysql2": "^2.3.3"
   },
   "devDependencies": {
+    "chai": "^4.3.6",
     "concurrently": "^7.3.0",
-    "nodemon": "^2.0.19"
+    "mocha": "^10.0.0",
+    "nodemon": "^2.0.19",
+    "sinon": "^14.0.0"
   }
 }

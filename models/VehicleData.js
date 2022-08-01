@@ -21,7 +21,7 @@ class VehicleData extends MySQL {
     super
       .getAll()
       .then((vehiclesData) => {
-        if (vehiclesData.length) return;
+        if (vehiclesData?.length) return;
         mockVehiclesData.forEach((vehicleData) => super.create(vehicleData));
       })
       .catch((error) => console.error(error));

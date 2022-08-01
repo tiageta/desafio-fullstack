@@ -1,5 +1,14 @@
 const pool = require("../config/db-connection");
 
+const createTable = (sql) => {
+  return new Promise((resolve, reject) => {
+    pool.query(sql, (error) => {
+      if (error) reject(error);
+      resolve(null);
+    });
+  });
+};
+
 const insert = (values, table) => {
   return new Promise((resolve, reject) => {
     pool.query(`INSERT INTO ?? SET ?`, [table, values], (error, results) => {
@@ -54,6 +63,7 @@ const deleteById = (id, table) => {
 };
 
 module.exports = {
+  createTable,
   insert,
   selectAll,
   selectByParams,
