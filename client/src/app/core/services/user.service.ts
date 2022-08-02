@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import jwt_decode from 'jwt-decode';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { User } from 'src/app/shared/models/user.model';
+import { LogoutService } from './logout.service';
 import { TokenService } from './token.service';
 
 @Injectable({
@@ -11,7 +12,11 @@ import { TokenService } from './token.service';
 export class UserService {
   private userSubject = new BehaviorSubject<User>({});
 
-  constructor(private tokenService: TokenService, private router: Router) {
+  constructor(
+    private tokenService: TokenService,
+    private router: Router,
+    private logoutService: LogoutService
+  ) {
     if (this.tokenService.hasToken()) {
       this.updateUser();
     }
@@ -33,9 +38,10 @@ export class UserService {
   }
 
   logout(): void {
+    this.router.navigate(['/']);
     this.tokenService.deleteToken();
     this.userSubject.next({});
-    this.router.navigate(['/']);
+    this.logoutService.handleLogout();
   }
 
   isLoggedIn(): boolean {
