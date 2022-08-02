@@ -23,11 +23,11 @@ import { AutoLoginService } from 'src/app/core/services/auto-login.service';
   ],
 })
 export class LoginFormComponent implements OnInit, OnDestroy {
-  private _autoLogin = false;
   private _authSub = new Subscription();
 
   username = '';
   password = '';
+  autoLogin = false;
   passwordType: 'password' | 'text' = 'password';
   isPasswordShown = false;
   isSigningIn = false;
@@ -40,7 +40,7 @@ export class LoginFormComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit(): void {
-    this._autoLogin = this.autoLoginService.isAutoLoginEnabled();
+    this.autoLogin = this.autoLoginService.isAutoLoginEnabled();
   }
 
   ngOnDestroy(): void {
@@ -78,11 +78,7 @@ export class LoginFormComponent implements OnInit, OnDestroy {
     this.isTooltipVisible = !this.isTooltipVisible;
   }
 
-  get autoLogin() {
-    return this._autoLogin;
-  }
-  set autoLogin(value) {
-    this._autoLogin = value;
-    this.autoLoginService.setAutoLogin(this._autoLogin);
+  setAutoLogin(value: boolean): void {
+    this.autoLoginService.setAutoLogin(value);
   }
 }
