@@ -37,8 +37,8 @@ module.exports = () => {
   app.use("/logout", require("../routes/logout"));
   app.use("/refresh", require("../routes/refresh"));
 
-  app.use("/vehicles", require("../routes/api/vehicles"));
-  app.use("/vehiclesData", require("../routes/api/vehicles-data"));
+  app.use("/vehicles", verifyJWT, require("../routes/api/vehicles"));
+  app.use("/vehiclesData", verifyJWT, require("../routes/api/vehicles-data"));
   app.use("/users", verifyJWT, require("../routes/api/users"));
 
   app.use("/", require("../routes/angular-app"));

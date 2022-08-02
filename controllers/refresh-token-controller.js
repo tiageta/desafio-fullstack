@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
+const { ACCESS_EXPIRE } = require("../config/token-expire");
 
 const handleRefreshToken = async (req, res) => {
   try {
@@ -19,7 +20,7 @@ const handleRefreshToken = async (req, res) => {
         const accessToken = jwt.sign(
           { username: decoded.username },
           process.env.ACCESS_TOKEN_SECRET,
-          { expiresIn: "5m" }
+          { expiresIn: ACCESS_EXPIRE }
         );
         res.json({ accessToken });
       }

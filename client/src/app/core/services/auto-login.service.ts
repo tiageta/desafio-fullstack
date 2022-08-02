@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { CookieService } from 'ngx-cookie-service';
 
 const KEY = 'autoLogin';
 
@@ -6,11 +7,13 @@ const KEY = 'autoLogin';
   providedIn: 'root',
 })
 export class AutoLoginService {
+  constructor(private cookieService: CookieService) {}
+
   isAutoLoginEnabled(): boolean {
-    return localStorage.getItem(KEY) === 'true';
+    return this.cookieService.get('rememberme') === 'true';
   }
 
-  setAutoLogin(value: boolean) {
-    localStorage.setItem(KEY, String(value));
+  setAutoLogin(value: boolean): void {
+    this.cookieService.set('rememberme', String(value));
   }
 }

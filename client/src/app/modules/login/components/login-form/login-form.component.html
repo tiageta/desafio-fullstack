@@ -63,19 +63,20 @@
   <div id="auto-login-field" class="mb-3">
     <div class="d-flex justify-content-center justify-content-md-end">
       <label
-        class="form-check-label"
+        class="form-check-label fst-italic"
         for="flexSwitchCheckDefault"
         style="margin-top: 2px"
       >
-        Logar automaticamente
+        Lembre de mim
       </label>
-      <div class="toggle-switch form-check-inline form-switch ms-5 me-0">
+      <div class="toggle-switch form-check-inline form-switch ms-2 me-0">
         <input
           class="form-check-input"
           type="checkbox"
           role="switch"
           id="flexSwitchCheckDefault"
           [(ngModel)]="autoLogin"
+          (ngModelChange)="setAutoLogin(autoLogin)"
           name="autoLogin"
         />
         <i
@@ -83,6 +84,7 @@
           tabindex="0"
           (mouseover)="showTooltip()"
           (mouseout)="hideTooltip()"
+          (blur)="hideTooltip()"
           (keypress)="toggleTooltip()"
           (touchstart)="toggleTooltip()"
         >
@@ -91,10 +93,9 @@
           @fade
           class="login-tooltip"
           *ngIf="isTooltipVisible"
-          (touchstart)="toggleTooltip()"
+          (touchstart)="hideTooltip()"
         >
-          Se desmarcado, será necessário entrar com o login novamente após 10
-          segundos da página ter sido fechada.
+          Se marcado, só será preciso logar-se novamente em 30 dias.
         </div>
       </div>
     </div>
