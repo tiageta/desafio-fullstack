@@ -7,6 +7,7 @@ import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { CoreModule } from './core/core.module';
 import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
+import { CookieService } from 'ngx-cookie-service';
 
 @NgModule({
   declarations: [AppComponent],
@@ -18,6 +19,7 @@ import { NgbModalModule } from '@ng-bootstrap/ng-bootstrap';
     NgbModalModule,
     AppRoutingModule,
   ],
+  providers: [CookieService],
   bootstrap: [AppComponent],
 })
 export class AppModule {}
