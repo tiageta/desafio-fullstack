@@ -41,7 +41,7 @@ module.exports = () => {
   app.use("/vehiclesData", verifyJWT, require("../routes/api/vehicles-data"));
   app.use("/users", verifyJWT, require("../routes/api/users"));
 
-  app.use("/", require("../routes/angular-app"));
+  app.use("*", require("../routes/angular-app"));
 
   return app;
 };
