@@ -8,7 +8,7 @@ Você pode acessar uma versão de deploy hospedada no Heroku [aqui](https://ford
 
 ## Banco de dados MySQL
 
-Um servidor MySQL está rodando em nuvem por meio do ClearDB e Heroku. Caso se queira alternar para um desenvolvimento local, as configurações do banco de dados devem ser ajustadas em `backend/express/config/db-connection.js` – o esquema que for especificado (`ford_api` por padrão) será preenchido automaticamente com valores de teste, ao rodar a API.
+Um servidor MySQL está rodando em nuvem por meio do ClearDB e Heroku. Caso se queira alternar para um desenvolvimento local, as configurações do banco de dados devem ser ajustadas em `config/db-connection.js` – o esquema que for especificado (`ford_api` por padrão) será preenchido automaticamente com valores de teste, ao rodar a API.
 
 ## Servidor de desenvolvimento
 
