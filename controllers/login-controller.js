@@ -30,7 +30,6 @@ const verifyUser = async (req, res) => {
         process.env.ACCESS_TOKEN_SECRET,
         { expiresIn: ACCESS_EXPIRE }
       );
-      console.log(ACCESS_EXPIRE, REFRESH_MAX_EXPIRE);
       const refreshToken = jwt.sign(
         { username: foundUser.username },
         process.env.REFRESH_TOKEN_SECRET,
